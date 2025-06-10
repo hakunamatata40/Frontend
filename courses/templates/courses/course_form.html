@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{# REMOVE THIS LINE: {% load tailwind_filters %} #}
+
+{% block title %}{% if course %}Edit Course{% else %}Create New Course{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
+    <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">
+        {% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %}
+    </h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {# Manual form rendering starts here #}
+        {% for field in form %}
+            <div class="mb-4">
+                {# Display label #}
+                <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">
+                    {{ field.label }}
+                    {% if field.field.required %}
+                        <span class="text-red-500">*</span>
+                    {% endif %}
+                </label>
+
+                {# Display the input field with Tailwind classes #}
+                {{ field }}
+
+                {# Display field errors #}
+                {% if field.errors %}
+                    <ul class="text-red-600 text-xs mt-1">
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {# Display help text #}
+                {% if field.help_text %}
+                    <p class="text-gray-600 text-xs italic mt-1">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        {# Manual form rendering ends here #}
+
+        <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+            {% if course %}Update Course{% else %}Create Course{% endif %}
+        </button>
+    </form>
+    <div class="text-center mt-4">
+        <a href="{% url 'instructor_dashboard' %}" class="text-blue-600 hover:underline">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

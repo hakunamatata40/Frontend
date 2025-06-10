@@ -1,0 +1,33 @@
+# ehblo_clone/.gitignore
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+lib/
+lib64/
+bin/
+include/
+share/
+.pytest_cache/
+.tox/
+.coverage
+.cache
+.ipynb_checkpoints
+*.env
+.vscode/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/ # We might ignore actual media files from repo if using cloud storage
+staticfiles/
+
+# IDEs
+.idea/
+*.swp
+*~

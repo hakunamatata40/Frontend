@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Enrolled Courses{% endblock %}
+
+{% block content %}
+<h1 class="text-4xl font-bold text-center text-blue-800 mb-8">My Enrolled Courses</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for enrollment in enrollments %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ enrollment.course.title }}</h2>
+                <p class="text-sm text-gray-600 mb-3">{{ enrollment.course.overview|truncatechars:100 }}</p>
+                <p class="text-md text-gray-700">Instructor: <span class="font-medium">{{ enrollment.course.instructor.get_full_name|default:enrollment.course.instructor.username }}</span></p>
+                <p class="text-md text-gray-700">Enrolled On: <span class="font-medium">{{ enrollment.enrolled_at|date:"F d, Y" }}</span></p>
+                <p class="text-sm text-gray-600 mt-2">Progress: {{ enrollment.get_progress|floatformat:"0" }}%</p>
+
+                <a href="{% url 'course_player_home' enrollment.pk %}"
+                   class="block w-full text-center bg-blue-600 text-white p-3 rounded-md mt-4 hover:bg-blue-700 transition duration-300">
+                    Go to Course
+                </a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-span-full text-center py-10">
+            <p class="text-lg text-gray-600">You haven't enrolled in any courses yet.</p>
+            <a href="{% url 'course_list' %}" class="mt-4 inline-block bg-green-600 text-white px-5 py-2 rounded-md hover:bg-green-700 transition duration-300">
+                Browse Courses
+            </a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

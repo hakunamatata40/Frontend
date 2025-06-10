@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Checkout: {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
+    <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">Checkout for {{ course.title }}</h2>
+    <p class="text-xl text-center text-gray-800 mb-6">
+        Total: <span class="font-bold">FCFA{{ course.price }}</span>
+    </p>
+
+    <div id="stripe-error-message" class="text-red-600 text-center mb-4 hidden"></div>
+
+    <form id="payment-form">
+        <div id="payment-element" class="mb-6">
+            </div>
+        <button id="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+            <div class="spinner hidden" id="spinner"></div>
+            <span id="button-text">Pay Now</span>
+        </button>
+    </form>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe("{{ stripe_public_key }}");
+    const elements = stripe.elements();
+    const paymentForm = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit');
+    const buttonText = document.getElementById('button-text');
+    const spinner = document.getElementById('spinner');
+    const errorMessage = document.getElementById('stripe-error-message');
+
+    let clientSecret;
+
+    // Fetch the PaymentIntent client secret from your server
+    fetch("{% url 'checkout' course.id %}", {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+        // **MODIFIED LINE:** Added quotes around {{ course.id }}
+        body: JSON.stringify({ course_id: "{{ course.id }}" })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            errorMessage.textContent = data.error;
+            errorMessage.classList.remove('hidden');
+            submitButton.disabled = true;
+            return;
+        }
+        clientSecret = data.clientSecret;
+        const appearance = {
+            theme: 'stripe',
+            variables: {
+                colorPrimary: '#2563EB', // Blue-600
+                colorBackground: '#ffffff',
+                colorText: '#374151', // Gray-700
+            }
+        };
+        const options = {
+            layout: {
+                type: 'tabs',
+                tabs: {
+                    billingDetails: 'never' // Or 'auto' if you want Stripe to collect billing details
+                }
+            }
+        };
+        const paymentElement = elements.create("payment", { clientSecret, appearance, ...options });
+        paymentElement.mount("#payment-element");
+    })
+    .catch(error => {
+        errorMessage.textContent = 'Failed to load payment form. Please try again.';
+        errorMessage.classList.remove('hidden');
+        submitButton.disabled = true;
+        console.error('Error fetching client secret:', error);
+    });
+
+    paymentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                // Return URL for the redirect after payment
+                return_url: "{% url 'payment_success' %}",
+                // You can add more data here if needed, but the important metadata is handled by PaymentIntent creation
+            },
+            redirect: 'if_required', // Recommended for handling SCA and other flows
+        });
+
+        if (error) {
+            errorMessage.textContent = error.message || 'An unexpected error occurred.';
+            errorMessage.classList.remove('hidden');
+            setLoading(false);
+        } else {
+            // Payment succeeded and no redirect was needed (e.g., card was already authorized)
+            // Or, if redirect was needed, the user is redirected to the return_url and then webhook will handle it.
+            // For a robust system, rely on webhooks for final confirmation.
+            window.location.href = "{% url 'payment_success' %}";
+        }
+    });
+
+    function setLoading(isLoading) {
+        if (isLoading) {
+            submitButton.disabled = true;
+            spinner.classList.remove("hidden");
+            buttonText.classList.add("hidden");
+        } else {
+            submitButton.disabled = false;
+            spinner.classList.add("hidden");
+            buttonText.classList.remove("hidden");
+        }
+    }
+</script>
+{% endblock %}

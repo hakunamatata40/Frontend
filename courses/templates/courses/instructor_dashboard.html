@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Instructor Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="text-4xl font-bold text-center text-blue-800 mb-8">Instructor Dashboard</h1>
+
+<div class="text-center mb-8">
+    <a href="{% url 'course_create' %}" class="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300">
+        Create New Course
+    </a>
+</div>
+
+<h2 class="text-3xl font-bold text-gray-900 mb-6">My Courses</h2>
+
+{% if courses %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for course in courses %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden border {% if not course.is_published %}border-yellow-400{% else %}border-blue-200{% endif %}">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ course.title }}</h3>
+                    <p class="text-sm text-gray-600 mb-3">{{ course.overview|truncatechars:100 }}</p>
+                    <p class="text-md text-gray-700">Subject: <span class="font-medium">{{ course.subject.name }}</span></p>
+                    <p class="text-md text-gray-700">Modules: <span class="font-medium">{{ course.num_modules }}</span></p>
+                    <p class="text-md text-gray-700">Price: <span class="font-medium">
+                        {% if course.price > 0 %}FCFA{{ course.price }}{% else %}Free{% endif %}
+                    </span></p>
+                    <p class="text-md font-medium {% if course.is_published %}text-green-600{% else %}text-yellow-600{% endif %}">
+                        Status: {% if course.is_published %}Published{% else %}Draft{% endif %}
+                    </p>
+
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <a href="{% url 'course_detail' course.id course.slug %}"
+                           class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300 text-sm">
+                           View/Manage
+                        </a>
+                        <a href="{% url 'course_edit' course.id %}"
+                           class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300 text-sm">
+                           Edit
+                        </a>
+                        <a href="{% url 'course_delete' course.id %}"
+                           class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300 text-sm">
+                           Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-center text-gray-600 text-lg mt-10">You haven't created any courses yet.</p>
+{% endif %}
+{% endblock %}
