@@ -5,7 +5,22 @@
 
 {% block content %}
 <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
-    <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">My Profile</h2>
+    {# Changed text-blue-600 to text-purple-600 #}
+    <h2 class="text-3xl font-bold text-center text-purple-600 mb-6">My Profile</h2>
+
+    {# --- ADD THIS SECTION TO DISPLAY THE PROFILE PICTURE --- #}
+    <div class="mb-6 flex justify-center">
+        {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s profile picture" 
+                 class="w-32 h-32 rounded-full object-cover border-4 border-purple-300 shadow-lg">
+        {% else %}
+            {# Fallback to a default static image if no profile picture is uploaded #}
+            <img src="{% static 'images/default_profile_pic.png' %}" alt="Default profile picture" 
+                 class="w-32 h-32 rounded-full object-cover border-4 border-gray-300 shadow-lg">
+        {% endif %}
+    </div>
+    {# --- END OF NEW SECTION --- #}
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
@@ -27,10 +42,12 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Update Profile</button>
+        {# Changed bg-blue-600 to bg-purple-600 and hover:bg-blue-700 to hover:bg-purple-700 #}
+        <button type="submit" class="w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300">Update Profile</button>
     </form>
     <div class="text-center mt-6">
-        <a href="{% url 'password_change' %}" class="text-blue-600 hover:underline">Change Password</a>
+        {# Changed text-blue-600 to text-purple-600 #}
+        <a href="{% url 'password_change' %}" class="text-purple-600 hover:underline">Change Password</a>
     </div>
 </div>
 {% endblock %}

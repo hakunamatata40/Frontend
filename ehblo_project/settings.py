@@ -19,7 +19,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'default-insecure-key-for-dev-only')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True' # Controlled by environment variable
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') # Convert string to list
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0aee-41-202-207-5.ngrok-free.app'] # Convert string to list
+
+CSRF_TRUSTED_ORIGINS = ['https://0aee-41-202-207-5.ngrok-free.app']
 
 # Application definition
 

@@ -1,21 +1,25 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Welcome to EHBLO{% endblock %}
+{% block title %}EHBLO{% endblock %}
 
 {% block content %}
-<div class="text-center py-20 bg-blue-50 rounded-lg shadow-md">
-    <h1 class="text-5xl font-extrabold text-blue-800 mb-4 animate-fade-in-down">
+{# Changed bg-blue-50 to bg-purple-50 #}
+<div class="text-center py-20 bg-purple-50 rounded-lg shadow-md">
+    {# Changed text-blue-800 to text-purple-800 #}
+    <h1 class="text-5xl font-extrabold text-purple-800 mb-4 animate-fade-in-down">
         Learn Anything, Anywhere, Anytime
     </h1>
     <p class="text-xl text-gray-700 mb-8 animate-fade-in-up">
         Your journey to knowledge starts here. Explore our diverse range of courses.
     </p>
     <div class="flex flex-col sm:flex-row justify-center gap-4">
+        {# Changed bg-blue-600 to bg-purple-600 and hover:bg-blue-700 to hover:bg-purple-700 #}
         <a href="{% url 'course_list' %}"
-           class="bg-blue-600 text-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-blue-700 transition duration-300 transform hover:scale-105 animate-bounce-in">
+           class="bg-purple-600 text-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-purple-700 transition duration-300 transform hover:scale-105 animate-bounce-in">
             Browse All Courses
         </a>
+        {# Keeping green buttons as a contrasting accent #}
         {% if not user.is_authenticated %}
             <a href="{% url 'signup' %}"
                class="bg-green-600 text-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-105 animate-bounce-in">
@@ -40,7 +44,7 @@
                 <div class="p-6">
                     <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ course.title }}</h3>
                     <p class="text-gray-600">{{ course.overview|truncatechars:100 }}</p>
-                    <a href="{% url 'course_detail' course.id course.slug %}" class="block mt-4 text-blue-600 hover:underline">Learn More &rarr;</a>
+                    <a href="{% url 'course_detail' course.id course.slug %}" class="block mt-4 text-purple-600 hover:underline">Learn More &rarr;</a>
                 </div>
             </div>
         {% empty %}

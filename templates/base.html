@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}EHBLO Clone{% endblock %}</title>
+    <title>{% block title %}EHBLO{% endblock %}</title>
     {% load static %}
+    
+    {# NEW: Favicon link for the browser tab title #}
+    <link rel="icon" type="image/x-icon" href="{% static 'images/logo.png' %}"> 
+    
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -20,7 +24,7 @@
         input[type="url"],
         textarea,
         select {
-            @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm;
+            @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm; /* Changed focus ring/border to purple */
         }
         /* Style for required fields (optional, requires JS or custom template tags) */
         label.required:after {
@@ -71,35 +75,42 @@
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
-    <nav class="bg-blue-700 p-4 shadow-lg">
+    <nav class="bg-purple-700 p-4 shadow-lg">
         <div class="container mx-auto flex flex-wrap justify-between items-center">
-            <a href="{% url 'home' %}" class="text-white text-3xl font-extrabold rounded-lg p-2 hover:bg-blue-800 transition duration-300">
-                EHBLO
+            <a href="{% url 'home' %}" class="text-white text-3xl font-extrabold rounded-lg p-2 hover:bg-purple-800 transition duration-300 flex items-center space-x-2">
+                <img src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-8 w-8 object-contain">
+                <span>EHBLO</span>
             </a>
             <button class="lg:hidden text-white focus:outline-none" onclick="document.getElementById('nav-menu').classList.toggle('hidden')">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
             </button>
             <div id="nav-menu" class="hidden lg:flex flex-grow lg:flex-grow-0 lg:items-center w-full lg:w-auto mt-4 lg:mt-0">
                 <div class="flex flex-col lg:flex-row lg:space-x-6 space-y-3 lg:space-y-0 lg:ml-auto">
-                    <a href="{% url 'course_list' %}" class="text-white hover:text-blue-200 p-2 rounded-lg hover:bg-blue-800 transition duration-300 font-medium">Courses</a>
+                    <a href="{% url 'course_list' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Courses</a>
                     {% if user.is_authenticated %}
                         {% if user.user_type == 'instructor' %}
-                            <a href="{% url 'instructor_dashboard' %}" class="text-white hover:text-blue-200 p-2 rounded-lg hover:bg-blue-800 transition duration-300 font-medium">Instructor Dashboard</a>
+                            <a href="{% url 'instructor_dashboard' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Instructor Dashboard</a>
                         {% endif %}
-                        <a href="{% url 'my_courses' %}" class="text-white hover:text-blue-200 p-2 rounded-lg hover:bg-blue-800 transition duration-300 font-medium">My Courses</a>
-                        <a href="{% url 'profile' %}" class="text-white hover:text-blue-200 p-2 rounded-lg hover:bg-blue-800 transition duration-300 font-medium">Profile</a>
+                        <a href="{% url 'my_courses' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">My Courses</a>
+                        <a href="{% url 'profile' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Profile</a>
 
-                        {# MODIFIED: Changed logout link to a form for POST request #}
                         <form action="{% url 'logout' %}" method="post" class="inline-block">
                             {% csrf_token %}
-                            <button type="submit" class="text-white hover:text-blue-200 p-2 rounded-lg hover:bg-blue-800 transition duration-300 font-medium cursor-pointer">
-                                Logout ({{ user.username }})
+                            {# MODIFIED: Added profile picture beside the username in the logout button #}
+                            <button type="submit" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium cursor-pointer flex items-center space-x-2">
+                                {% if user.profile_picture %}
+                                    <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover border border-purple-300">
+                                {% else %}
+                                    {# Ensure you have this default_profile_pic.png in your static/images/ directory #}
+                                    <img src="{% static 'images/default_profile_pic.png' %}" alt="Default Profile" class="w-6 h-6 rounded-full object-cover border border-gray-300">
+                                {% endif %}
+                                <span>Logout ({{ user.username }})</span>
                             </button>
                         </form>
 
                     {% else %}
-                        <a href="{% url 'login' %}" class="text-white hover:text-blue-200 p-2 rounded-lg hover:bg-blue-800 transition duration-300 font-medium">Login</a>
-                        <a href="{% url 'signup' %}" class="text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-500 transition duration-300 font-medium">Sign Up</a>
+                        <a href="{% url 'login' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Login</a>
+                        <a href="{% url 'signup' %}" class="text-white bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-500 transition duration-300 font-medium">Sign Up</a>
                     {% endif %}
                 </div>
             </div>
@@ -114,13 +125,13 @@
                         {% if message.tags == 'success' %} bg-green-100 text-green-800 border border-green-200
                         {% elif message.tags == 'warning' %} bg-yellow-100 text-yellow-800 border border-yellow-200
                         {% elif message.tags == 'error' %} bg-red-100 text-red-800 border border-red-200
-                        {% else %} bg-blue-100 text-blue-800 border border-blue-200
+                        {% else %} bg-purple-100 text-purple-800 border border-purple-200
                         {% endif %}">
                         <svg class="w-5 h-5 mr-2
                             {% if message.tags == 'success' %} text-green-500
                             {% elif message.tags == 'warning' %} text-yellow-500
                             {% elif message.tags == 'error' %} text-red-500
-                            {% else %} text-blue-500
+                            {% else %} text-purple-500
                             {% endif %}"
                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             {% if message.tags == 'success' %}

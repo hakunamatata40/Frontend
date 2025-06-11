@@ -1,9 +1,9 @@
 # courses/models.py
 from django.db import models
 from django.conf import settings
-from taggit.managers import TaggableManager # pip install django-taggit
-from django.template.loader import render_to_string # For dynamic content rendering
-from django.utils.text import slugify # For slug creation
+from taggit.managers import TaggableManager
+from django.template.loader import render_to_string
+from django.utils.text import slugify
 
 class Subject(models.Model):
     name = models.CharField(max_length=200, unique=True)
@@ -26,8 +26,8 @@ class Course(models.Model):
                                    related_name='courses_created',
                                    limit_choices_to={'user_type': 'instructor'})
     subject = models.ForeignKey(Subject,
-                                on_delete=models.CASCADE,
-                                related_name='courses')
+                                 on_delete=models.CASCADE,
+                                 related_name='courses')
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique=True, blank=True)
     overview = models.TextField()
@@ -35,8 +35,11 @@ class Course(models.Model):
     updated = models.DateTimeField(auto_now=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00) # 0 for free courses
     is_published = models.BooleanField(default=False)
-    # Add tags for better search and categorization
     tags = TaggableManager(blank=True)
+
+    # ADD THIS LINE FOR THE COURSE THUMBNAIL IMAGE
+    image = models.ImageField(upload_to='course_thumbnails/', null=True, blank=True)
+    # 'course_thumbnails/' will be a subfolder inside your MEDIA_ROOT (e.g., ehblo_project/media/course_thumbnails/)
 
     class Meta:
         ordering = ('-created',)
@@ -60,17 +63,16 @@ class Module(models.Model):
                                related_name='modules')
     title = models.CharField(max_length=250)
     description = models.TextField(blank=True)
-    order = models.PositiveIntegerField(default=0, blank=True, null=True) # For ordering modules
+    order = models.PositiveIntegerField(default=0, blank=True, null=True)
 
     class Meta:
         ordering = ('order',)
-        unique_together = ('course', 'title') # A module title should be unique within a course
+        unique_together = ('course', 'title')
 
     def __str__(self):
         return f'{self.order}. {self.title}'
 
 
-# Use Django's ContentType framework for generic relations for content types
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
@@ -78,7 +80,7 @@ class Content(models.Model):
     module = models.ForeignKey(Module,
                                on_delete=models.CASCADE,
                                related_name='contents')
-    title = models.CharField(max_length=250, blank=True) # Optional title for individual content item
+    title = models.CharField(max_length=250, blank=True)
     order = models.PositiveIntegerField(default=0, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -95,7 +97,7 @@ class Content(models.Model):
 
     class Meta:
         ordering = ('order',)
-        unique_together = ('module', 'order') # Order should be unique within a module
+        unique_together = ('module', 'order')
 
     def __str__(self):
         return f"{self.module.course.title} - {self.module.title} - {self.item.__class__.__name__}"
@@ -108,7 +110,7 @@ class TextContent(models.Model):
     content = models.TextField()
 
     class Meta:
-        verbose_name_plural = "Text Contents" # For better display in admin
+        verbose_name_plural = "Text Contents"
     def __str__(self):
         return "Text Content"
 
@@ -121,7 +123,7 @@ class VideoContent(models.Model):
         return "Video Content"
 
 class ImageContent(models.Model):
-    image = models.ImageField(upload_to='course_images/')
+    image = models.ImageField(upload_to='course_images/') # This is for images *within* modules
 
     class Meta:
         verbose_name_plural = "Image Contents"
@@ -139,18 +141,17 @@ class FileContent(models.Model):
 
 class Enrollment(models.Model):
     student = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                on_delete=models.CASCADE,
-                                related_name='enrollments',
-                                limit_choices_to={'user_type': 'student'})
+                                 on_delete=models.CASCADE,
+                                 related_name='enrollments',
+                                 limit_choices_to={'user_type': 'student'})
     course = models.ForeignKey(Course,
                                on_delete=models.CASCADE,
                                related_name='enrollments')
     enrolled_at = models.DateTimeField(auto_now_add=True)
-    # To track progress: store IDs of completed content items
     completed_contents = models.ManyToManyField(Content, blank=True, related_name='completed_by_students')
 
     class Meta:
-        unique_together = ('student', 'course') # A student can enroll in a course only once
+        unique_together = ('student', 'course')
 
     def __str__(self):
         return f'{self.student.username} enrolled in {self.course.title}'
