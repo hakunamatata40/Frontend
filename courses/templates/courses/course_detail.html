@@ -1,7 +1,7 @@
 {# courses/templates/courses/course_detail.html #}
 {% extends "base.html" %}
 {% load static %}
-
+{% load courses_extras %}
 
 {% block title %}{{ course.title }}{% endblock %}
 
@@ -47,7 +47,7 @@
                    class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 shadow-md">
                     Go to Course Chat (Instructor)
                 </a>
-            {% elif user.user_type == 'student' and user_is_enrolled %} {# MODIFIED THIS LINE #}
+            {% elif user.user_type == 'student' and user_is_enrolled %}
                 {# Enrolled students see the chat link #}
                 <a href="{% url 'course_chat_detail' course.id %}"
                    class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 shadow-md">
@@ -92,11 +92,20 @@
                             {% for content in module.contents.all %}
                                 <li class="mb-1 flex justify-between items-center">
                                     <span>
-                                    
+                                        {# Display content title and link it for enrolled students #}
+                                        {% if user.is_authenticated and user.user_type == 'student' and user_is_enrolled %}
+                                            <a href="{% url 'course_player_content' enrollment.pk module.pk content.pk %}" class="text-blue-700 hover:underline font-medium">
+                                                {{ content.order }}. {{ content.title }}
+                                            </a>
+                                        {% else %}
+                                            {{ content.order }}. {{ content.title }}
+                                        {% endif %}
                                     </span>
                                     {% if user.is_authenticated and user.user_type == 'instructor' and course.instructor == user %}
                                         <div class="flex space-x-2 text-sm">
-                                            
+                                            {# Add edit link for content for instructors #}
+                                            <a href="{% url 'module_content_update' module.pk content.pk content.item|lower_class_name %}" 
+                                               class="text-blue-500 hover:underline">Edit</a>
                                             <a href="{% url 'content_delete' content.pk %}" class="text-red-500 hover:underline">Delete</a>
                                         </div>
                                     {% endif %}
@@ -119,7 +128,7 @@
     {% endif %}
 
     <div class="mt-8 text-center">
-        {% if user_is_enrolled and user.user_type == 'student' %} {# MODIFIED THIS LINE #}
+        {% if user_is_enrolled and user.user_type == 'student' %}
             <a href="{% url 'course_player_home' enrollment.pk %}" class="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300">
                 Continue Course
             </a>
@@ -128,11 +137,8 @@
             <form action="{% url 'enroll_course' course.pk %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300">
-                    {% if course.price > 0 %}
-                        Enroll for FCFA{{ course.price }}
-                    {% else %}
-                        Enroll for Free
-                    {% endif %}
+                    {# Simplified button text, as payment is no longer required #}
+                    Enroll Now
                 </button>
             </form>
         {% elif not user.is_authenticated %}

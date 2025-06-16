@@ -8,6 +8,9 @@ from django.db.models import Count, Q
 import django.db.models as models
 import json
 
+# NEW IMPORT: For function-based login requirement
+from django.contrib.auth.decorators import login_required
+
 from .models import Course, Subject, Module, Content, TextContent, VideoContent, ImageContent, FileContent, Enrollment
 from users.models import CustomUser
 from .forms import CourseForm, ModuleForm, TextContentForm, VideoContentForm, ImageContentForm, FileContentForm, ContentForm
@@ -101,10 +104,6 @@ class CourseDetailView(DetailView):
             if self.request.user.user_type == 'instructor' and course.instructor == self.request.user:
                 # We'll use 'user_is_enrolled' to mean 'has access to chat/course content' for templates
                 user_is_enrolled = True 
-                # For instructors, 'enrollment' object doesn't apply directly,
-                # but if your system requires it for some reason, you might create a dummy
-                # or special enrollment record for them, or just rely on `user_is_enrolled` being True.
-                # For now, we'll keep it None as they are not "enrolled" in the student sense.
             elif self.request.user.user_type == 'student':
                 # For students, check for actual enrollment
                 try:
@@ -167,7 +166,7 @@ class ModuleCreateUpdateView(LoginRequiredMixin, InstructorRequiredMixin, Course
         module_id = self.kwargs.get('pk')
         return get_object_or_404(Module, pk=module_id, course_id=self.kwargs['course_id']) if module_id else None
 
-    def get(self, request, course_id, pk=None):
+    def get(self, request, course_id, pk=None): # pk is for content_id
         course = get_object_or_404(Course, id=course_id, instructor=request.user)
         module = self.get_object()
         form = self.module_form(instance=module)
@@ -326,26 +325,38 @@ class ContentDeleteView(LoginRequiredMixin, InstructorRequiredMixin, DeleteView)
 
 
 # --- Student Views ---
-def enroll_course(request, course_id): # Decorator @LoginRequiredMixin needs to be above the function
+
+# Apply the login_required decorator for function-based views
+@login_required 
+def enroll_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
+
+    # Ensure enrollment happens via POST for security and idempotence
+    if request.method != 'POST':
+        messages.error(request, "Enrollment must be done via a form submission (POST request).")
+        return redirect('course_detail', pk=course.id, slug=course.slug)
+
+    # Restrict enrollment to students only
     if request.user.user_type != 'student':
         messages.error(request, "Only students can enroll in courses.")
         return redirect('course_detail', pk=course.id, slug=course.slug)
 
-    # Check if already enrolled
+    # Check if the user is already enrolled
     if Enrollment.objects.filter(student=request.user, course=course).exists():
-        messages.info(request, "You are already enrolled in this course.")
-        return redirect('course_detail', pk=course.id, slug=course.slug)
+        messages.info(request, f"You are already enrolled in '{course.title}'.")
+        # Redirect to 'my_courses' if already enrolled to provide a consistent experience
+        return redirect('my_courses') 
 
-    if course.price == 0.00:
-        # Free course enrollment
+    # --- MODIFIED LOGIC: Directly enroll regardless of course.price ---
+    try:
         Enrollment.objects.create(student=request.user, course=course)
-        messages.success(request, f"You have successfully enrolled in the free course: {course.title}!")
-        return redirect('my_courses')
-    else:
-        # Paid course - redirect to checkout
-        messages.info(request, "Redirecting to checkout for payment.")
-        return redirect('checkout', course_id=course.id)
+        messages.success(request, f"Congratulations! You have successfully enrolled in '{course.title}'!")
+        # Redirect the user to their list of enrolled courses
+        return redirect('my_courses') 
+    except Exception as e:
+        messages.error(request, f"Failed to enroll in '{course.title}'. An unexpected error occurred: {e}")
+        # Redirect back to the course detail page on error
+        return redirect('course_detail', pk=course.id, slug=course.slug)
 
 class EnrolledCourseListView(LoginRequiredMixin, ListView):
     model = Enrollment
