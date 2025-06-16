@@ -1,16 +1,26 @@
 {% extends "base.html" %}
 {% load static %}
-{# REMOVE THIS LINE: {% load tailwind_filters %} #}
 
 {% block title %}{% if course %}Edit Course{% else %}Create New Course{% endif %}{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
-    <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">
+    {# Changed text-blue-600 to text-purple-600 #}
+    <h2 class="text-3xl font-bold text-center text-purple-600 mb-6">
         {% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %}
     </h2>
-    <form method="post" enctype="multipart/form-data">
+    {# The enctype="multipart/form-data" is already correctly set, which is crucial for file uploads. #}
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
+
+        {# --- NEW: Display current image if editing an existing course --- #}
+        {% if course and course.image %}
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Current Image:</label>
+                <img src="{{ course.image.url }}" alt="{{ course.title }}" class="w-48 h-auto object-cover rounded-lg shadow-sm border border-gray-200">
+            </div>
+        {% endif %}
+        {# --- END NEW SECTION --- #}
 
         {# Manual form rendering starts here #}
         {% for field in form %}
@@ -23,8 +33,16 @@
                     {% endif %}
                 </label>
 
-                {# Display the input field with Tailwind classes #}
-                {{ field }}
+                {# Display the input field. Tailwind classes are applied in forms.py #}
+                {# Special handling for checkbox for better visual alignment #}
+                {% if field.field.widget.input_type == 'checkbox' %}
+                    <div class="flex items-center">
+                        {{ field }}
+                        <span class="ml-2 text-gray-700">{{ field.label }}</span> {# Label for checkbox #}
+                    </div>
+                {% else %}
+                    {{ field }}
+                {% endif %}
 
                 {# Display field errors #}
                 {% if field.errors %}
@@ -43,12 +61,14 @@
         {% endfor %}
         {# Manual form rendering ends here #}
 
-        <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+        {# Changed bg-blue-600 to bg-purple-600 and hover:bg-blue-700 to hover:bg-purple-700 #}
+        <button type="submit" class="w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300">
             {% if course %}Update Course{% else %}Create Course{% endif %}
         </button>
     </form>
     <div class="text-center mt-4">
-        <a href="{% url 'instructor_dashboard' %}" class="text-blue-600 hover:underline">Back to Dashboard</a>
+        {# Changed text-blue-600 to text-purple-600 #}
+        <a href="{% url 'instructor_dashboard' %}" class="text-purple-600 hover:underline">Back to Dashboard</a>
     </div>
 </div>
 {% endblock %}
