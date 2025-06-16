@@ -92,6 +92,7 @@
                             <a href="{% url 'instructor_dashboard' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Instructor Dashboard</a>
                         {% endif %}
                         <a href="{% url 'my_courses' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">My Courses</a>
+                        <a href="{% url 'my_chats' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">My Chats</a> {# ADDED: New chat link #}
                         <a href="{% url 'profile' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Profile</a>
 
                         <form action="{% url 'logout' %}" method="post" class="inline-block">
@@ -141,7 +142,7 @@
                             {% elif message.tags == 'error' %}
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                             {% else %}
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414L8.586 9l-1.293-1.293a1 1 0 00-1.414 1.414L7.586 10l-1.293 1.293a1 1 0 001.414 1.414L8.586 11l1.293 1.293a1 1 0 001.414-1.414L10.414 10l1.293-1.293z" clip-rule="evenodd"></path>
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414L8.586 9l-1.293-1.293a1 1 0 00-1.414 1.414L7.586 10l-1.293 1.293a1 1 0 001.414 1.414L8.586 11l1.293-1.293a1 1 0 001.414-1.414L10.414 10l1.293-1.293z" clip-rule="evenodd"></path>
                             {% endif %}
                         </svg>
                         {{ message }}

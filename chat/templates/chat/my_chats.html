@@ -1,0 +1,35 @@
+{# chat/templates/chat/my_chats.html #}
+{% extends "base.html" %}
+{% block title %}My Chats{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">My Chats</h1>
+
+    {% if chats %}
+        <ul class="divide-y divide-gray-200">
+            {% for course in chats %}
+                <li class="py-4 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-semibold text-blue-700">{{ course.title }} Chat</h2>
+                        <p class="text-gray-600 text-sm">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                    </div>
+                    <a href="{% url 'course_chat_detail' course.id %}"
+                       class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
+                        Go to Chat
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-600 italic">You don't have access to any course chats yet.</p>
+        {% if user.is_authenticated and user.user_type == 'student' %}
+            <p class="text-gray-600 mt-2">Enroll in a course to join its chat!</p>
+            <a href="{% url 'course_list' %}" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Browse Courses</a>
+        {% elif user.is_authenticated and user.user_type == 'instructor' %}
+            <p class="text-gray-600 mt-2">Your courses will appear here once you've set them up.</p>
+            <a href="{% url 'instructor_dashboard' %}" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Go to Dashboard</a>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
