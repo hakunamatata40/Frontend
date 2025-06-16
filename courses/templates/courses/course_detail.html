@@ -1,3 +1,4 @@
+{# courses/templates/courses/course_detail.html #}
 {% extends "base.html" %}
 {% load static %}
 
@@ -36,6 +37,26 @@
             <p><strong class="font-semibold">Status:</strong> {% if course.is_published %}Published{% else %}Draft{% endif %}</p>
         </div>
     </div>
+
+    {# Chat Link Section #}
+    {% if user.is_authenticated %}
+        <div class="mb-6 text-center">
+            {% if user == course.instructor and user.user_type == 'instructor' %}
+                {# Instructor always sees the chat link for their own courses #}
+                <a href="{% url 'course_chat_detail' course.id %}"
+                   class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 shadow-md">
+                    Go to Course Chat (Instructor)
+                </a>
+            {% elif user.user_type == 'student' and user_is_enrolled %} {# MODIFIED THIS LINE #}
+                {# Enrolled students see the chat link #}
+                <a href="{% url 'course_chat_detail' course.id %}"
+                   class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 shadow-md">
+                    Join Course Chat
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+    {# End Chat Link Section #}
 
     {% if user.is_authenticated and user.user_type == 'instructor' and course.instructor == user %}
         <div class="flex space-x-4 mb-8">
@@ -98,7 +119,7 @@
     {% endif %}
 
     <div class="mt-8 text-center">
-        {% if user_is_enrolled %}
+        {% if user_is_enrolled and user.user_type == 'student' %} {# MODIFIED THIS LINE #}
             <a href="{% url 'course_player_home' enrollment.pk %}" class="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300">
                 Continue Course
             </a>

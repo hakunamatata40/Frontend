@@ -10,6 +10,7 @@ urlpatterns = [
     path('courses/', include('courses.urls')), # Course management
     path('payments/', include('payments.urls')), # Payment processing
     path('', include('core.urls')), # Home page and other general pages
+    path('chat/', include('chat.urls')), # ADD THIS LINE for your chat app
 ]
 
 # Serve media files in development. In production, use a dedicated web server (Nginx/Apache) or cloud storage (S3).

@@ -5,8 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.db.models import Count, Q
-import django.db.models as models # ADDED: Import Django's models module
-import json # MOVED: Import json to the top
+import django.db.models as models
+import json
 
 from .models import Course, Subject, Module, Content, TextContent, VideoContent, ImageContent, FileContent, Enrollment
 from users.models import CustomUser
@@ -64,13 +64,13 @@ class CourseListView(ListView):
                 Q(overview__icontains=query) |
                 Q(instructor__username__icontains=query) |
                 Q(tags__name__icontains=query) # Search by tags
-            ).distinct() # Use distinct to avoid duplicate results if a course matches multiple criteria
+            ).distinct()
 
         return queryset.annotate(num_modules=Count('modules')).order_by('-created')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['subjects'] = Subject.objects.annotate(total_courses=Count('courses', filter=Q(courses__is_published=True))) # Count published courses per subject
+        context['subjects'] = Subject.objects.annotate(total_courses=Count('courses', filter=Q(courses__is_published=True)))
         context['current_subject_slug'] = self.kwargs.get('subject_slug')
         context['query'] = self.request.GET.get('q', '')
         return context
@@ -96,11 +96,22 @@ class CourseDetailView(DetailView):
         enrollment = None
 
         if self.request.user.is_authenticated:
-            try:
-                enrollment = Enrollment.objects.get(student=self.request.user, course=course)
-                user_is_enrolled = True
-            except Enrollment.DoesNotExist:
-                user_is_enrolled = False
+            # Check if the user is an instructor and the owner of the course
+            # Instructors of their own courses also implicitly "have access" to the chat
+            if self.request.user.user_type == 'instructor' and course.instructor == self.request.user:
+                # We'll use 'user_is_enrolled' to mean 'has access to chat/course content' for templates
+                user_is_enrolled = True 
+                # For instructors, 'enrollment' object doesn't apply directly,
+                # but if your system requires it for some reason, you might create a dummy
+                # or special enrollment record for them, or just rely on `user_is_enrolled` being True.
+                # For now, we'll keep it None as they are not "enrolled" in the student sense.
+            elif self.request.user.user_type == 'student':
+                # For students, check for actual enrollment
+                try:
+                    enrollment = Enrollment.objects.get(student=self.request.user, course=course)
+                    user_is_enrolled = True
+                except Enrollment.DoesNotExist:
+                    user_is_enrolled = False
 
         context['user_is_enrolled'] = user_is_enrolled
         context['enrollment'] = enrollment
@@ -134,7 +145,7 @@ class CourseUpdateView(LoginRequiredMixin, InstructorRequiredMixin, CourseOwnerR
 
     def get_success_url(self):
         messages.success(self.request, "Course updated successfully!")
-        return reverse_lazy('course_detail', args=[self.object.id, self.object.slug]) # Redirect to course detail
+        return reverse_lazy('course_detail', args=[self.object.id, self.object.slug])
 
 class CourseDeleteView(LoginRequiredMixin, InstructorRequiredMixin, CourseOwnerRequiredMixin, DeleteView):
     model = Course
@@ -176,7 +187,7 @@ class ModuleCreateUpdateView(LoginRequiredMixin, InstructorRequiredMixin, Course
                 new_module.order = (max_order or 0) + 1
             new_module.save()
             messages.success(request, "Module saved successfully!")
-            return redirect('course_detail', pk=course.id, slug=course.slug) # Redirect to course detail
+            return redirect('course_detail', pk=course.id, slug=course.slug)
         return render(request, self.template_name, {'form': form, 'course': course, 'module': module})
 
 class ModuleDeleteView(LoginRequiredMixin, InstructorRequiredMixin, CourseOwnerRequiredMixin, DeleteView):
