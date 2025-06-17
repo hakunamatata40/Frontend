@@ -1,11 +1,10 @@
-# users/views.py
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
-from .models import CustomUser
+from .forms import CustomUserCreationForm # Ensure this is used for signup
+from .models import CustomUser # Ensure this is your custom user model
 
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
@@ -18,7 +17,18 @@ class CustomLoginView(LoginView):
 
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = CustomUser
-    fields = ['first_name', 'last_name', 'email', 'bio', 'profile_picture', 'phone_number', 'country']
+    # Add 'pedagogic_level' and 'interests' to the fields users can update
+    fields = [
+        'first_name',
+        'last_name',
+        'email',
+        'bio',
+        'profile_picture',
+        'phone_number',
+        'country',
+        'pedagogic_level', # New field
+        'interests',       # New field
+    ]
     template_name = 'users/profile.html'
     success_url = reverse_lazy('profile') # Redirect back to profile after update
 

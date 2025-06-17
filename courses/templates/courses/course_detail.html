@@ -1,7 +1,7 @@
 {# courses/templates/courses/course_detail.html #}
 {% extends "base.html" %}
 {% load static %}
-{% load courses_extras %}
+{% load courses_extras %} {# Make sure you have this line to load your custom filter #}
 
 {% block title %}{{ course.title }}{% endblock %}
 
@@ -104,7 +104,7 @@
                                     {% if user.is_authenticated and user.user_type == 'instructor' and course.instructor == user %}
                                         <div class="flex space-x-2 text-sm">
                                             {# Add edit link for content for instructors #}
-                                            <a href="{% url 'module_content_update' module.pk content.pk content.item|lower_class_name %}" 
+                                            <a href="{% url 'module_content_update' module.pk content.pk content.item|lower_class_name %}"
                                                class="text-blue-500 hover:underline">Edit</a>
                                             <a href="{% url 'content_delete' content.pk %}" class="text-red-500 hover:underline">Delete</a>
                                         </div>
