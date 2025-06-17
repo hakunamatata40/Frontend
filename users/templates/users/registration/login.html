@@ -1,36 +1,97 @@
 {% extends "base.html" %}
 {% load static %}
+{% load users_extras %}
 
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
-    <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">Log In</h2>
-    <form method="post">
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg mt-10 transition-all duration-500 transform hover:shadow-xl">
+    <h2 class="text-3xl font-bold text-center text-blue-600 mb-6 transform hover:scale-105 transition-transform duration-300">Log In</h2>
+
+    <form method="post" class="space-y-6">
         {% csrf_token %}
+
+        <!-- Floating Label Inputs -->
         {% for field in form %}
-            <div class="mb-4">
-                <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">{{ field.label }}</label>
-                {{ field }}
-                {% for error in field.errors %}
-                    <p class="text-red-500 text-xs italic">{{ error }}</p>
-                {% endfor %}
-            </div>
+        <div class="relative z-0 group">
+            {{ field|add_class:"block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" }}
+            <label for="{{ field.id_for_label }}"
+                   class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                {{ field.label }}
+            </label>
+
+            {% for error in field.errors %}
+                <p class="mt-2 text-red-500 text-xs italic animate-pulse">{{ error }}</p>
+            {% endfor %}
+        </div>
         {% endfor %}
+
         {% if form.non_field_errors %}
-            <div class="mb-4">
-                {% for error in form.non_field_errors %}
-                    <p class="text-red-500 text-xs italic">{{ error }}</p>
-                {% endfor %}
-            </div>
+        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg animate-bounce" role="alert">
+            {% for error in form.non_field_errors %}
+                <span class="font-medium">Error!</span> {{ error }}
+            {% endfor %}
+        </div>
         {% endif %}
-        <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Log In</button>
+
+        <button type="submit"
+                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+            Log In
+        </button>
     </form>
-    <p class="text-center text-gray-600 text-sm mt-4">
-        Don't have an account? <a href="{% url 'signup' %}" class="text-blue-600 hover:underline">Sign up</a>
-    </p>
-    <p class="text-center text-gray-600 text-sm mt-2">
-        <a href="{% url 'password_reset' %}" class="text-blue-600 hover:underline">Forgot password?</a>
-    </p>
+
+    <div class="mt-6 text-center space-y-3">
+        <p class="text-gray-600 text-sm">
+            Don't have an account?
+            <a href="{% url 'signup' %}" class="text-blue-600 hover:underline hover:text-blue-700 transition duration-200">
+                Sign up
+            </a>
+        </p>
+        <p class="text-gray-600 text-sm">
+            <a href="{% url 'password_reset' %}"
+               class="text-blue-600 hover:underline hover:text-blue-700 transition duration-200 relative group">
+                Forgot password?
+                <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+            </a>
+        </p>
+    </div>
 </div>
+
+<style>
+    /* Animation for input focus */
+    input:not(:placeholder-shown) ~ label,
+    input:focus ~ label {
+        color: #2563eb; /* blue-600 */
+        transform: translateY(-1.5rem) scale(0.75);
+    }
+
+    /* Smooth transition for the form container */
+    .animate-form {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation class to form container
+        const formContainer = document.querySelector('form');
+        formContainer.classList.add('animate-form');
+
+        // Add focus effects to inputs
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('ring-2', 'ring-blue-200', 'rounded-lg');
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('ring-2', 'ring-blue-200', 'rounded-lg');
+            });
+        });
+    });
+</script>
 {% endblock %}

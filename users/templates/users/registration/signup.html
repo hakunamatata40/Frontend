@@ -1,75 +1,167 @@
 {% extends "base.html" %}
 {% load static %}
-{% load users_extras %} {# Load your custom filter here #}
+{% load users_extras %}
 
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
 <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
-    <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">Create an Account</h2>
-    {# IMPORTANT: Add enctype="multipart/form-data" for file uploads like profile_picture #}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="mb-4">
-                {# Label for the field, with an asterisk for required fields #}
-                <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">
-                    {{ field.label }}
-                    {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
-                </label>
+    <!-- Étape 1 - Formulaire principal -->
+    <div id="step1">
+        <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">Create an Account</h2>
+        <form method="post" enctype="multipart/form-data" id="signupForm">
+            {% csrf_token %}
 
-                {# Conditional rendering and styling based on the field name #}
-                {% if field.name == 'interests' %} {# Special handling for the interests (checkboxes) field #}
-                    <div class="border border-gray-300 rounded p-3 bg-gray-50 max-h-48 overflow-y-auto">
-                        {% for choice in field %}
-                            <div class="flex items-center mb-1">
-                                {# MANUALLY CONSTRUCT THE INPUT TAG TO ADD CLASS DIRECTLY #}
-                                <input type="checkbox"
-                                       name="{{ choice.name }}"
-                                       value="{{ choice.value }}"
-                                       id="{{ choice.id_for_label }}"
-                                       {# Check if the checkbox should be pre-selected #}
-                                       {% if choice.data.selected %}checked{% endif %}
-                                       {# Add your Tailwind CSS classes directly here #}
-                                       class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out">
-                                <label for="{{ choice.id_for_label }}" class="ml-2 block text-sm text-gray-900 cursor-pointer">
-                                    {{ choice.choice_label }}
-                                </label>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {# Apply common Tailwind classes to all other standard input fields using the add_class filter #}
+            <!-- Afficher tous les champs SAUF les intérêts -->
+            {% for field in form %}
+                {% if field.name != 'interests' %}
+                <div class="mb-4">
+                    <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+
                     {{ field|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
-                {% endif %}
 
-                {# Help text #}
-                {% if field.help_text %}
-                    <p class="text-gray-500 text-xs italic mt-1">{{ field.help_text }}</p>
-                {% endif %}
-                {# Field-specific errors #}
-                {% for error in field.errors %}
-                    <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
-                {% endfor %}
-            </div>
-        {% endfor %}
+                    {% if field.help_text %}
+                        <p class="text-gray-500 text-xs italic mt-1">{{ field.help_text }}</p>
+                    {% endif %}
 
-        {# Non-field errors (e.g., password mismatch) #}
-        {% if form.non_field_errors %}
-            <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded relative" role="alert">
-                <strong class="font-bold">Error!</strong>
-                <span class="block sm:inline">
-                    {% for error in form.non_field_errors %}
-                        {{ error }}
+                    {% for error in field.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
                     {% endfor %}
-                </span>
-            </div>
-        {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
 
-        <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Sign Up</button>
-    </form>
-    <p class="text-center text-gray-600 text-sm mt-4">
-        Already have an account? <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Log in</a>
-    </p>
+            {% if form.non_field_errors %}
+                <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded relative" role="alert">
+                    <strong class="font-bold">Error!</strong>
+                    <span class="block sm:inline">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </span>
+                </div>
+            {% endif %}
+
+            <button type="button" id="nextBtn" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Suivant</button>
+        </form>
+    </div>
+
+    <!-- Étape 2 - Sélection des intérêts (cachée initialement) -->
+    <div id="step2" class="hidden">
+        <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">Vos centres d'intérêt</h2>
+        <p class="text-center text-gray-600 mb-6">Sélectionnez ce qui vous intéresse</p>
+
+        <div class="flex flex-wrap gap-3 mb-6">
+            {% with form.interests as interests_field %}
+                {% for choice in interests_field %}
+                    <label for="{{ choice.id_for_label }}" class="interest-card">
+                        <input type="checkbox"
+                               name="{{ choice.name }}"
+                               value="{{ choice.value }}"
+                               id="{{ choice.id_for_label }}"
+                               {% if choice.data.selected %}checked{% endif %}
+                               class="hidden">
+                        <div class="px-6 py-3 border-2 border-gray-200 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-blue-400 hover:bg-blue-50 hover:shadow-md">
+                            <span class="font-medium text-sm">{{ choice.choice_label }}</span>
+                        </div>
+                    </label>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
+        <div class="flex space-x-4 mt-8">
+            <button type="button" id="backBtn" class="flex-1 bg-gray-200 text-gray-800 p-3 rounded-lg font-semibold hover:bg-gray-300 transition duration-300">Retour</button>
+            <button type="submit" form="signupForm" class="flex-1 bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">S'inscrire</button>
+        </div>
+    </div>
 </div>
+
+<style>
+    .interest-card input:checked + div {
+        background-color: #3b82f6; /* blue-600 */
+        color: white;
+        border-color: #3b82f6;
+        transform: scale(1.05);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nextBtn = document.getElementById('nextBtn');
+        const backBtn = document.getElementById('backBtn');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+
+        // Animation pour passer à l'étape 2
+        nextBtn.addEventListener('click', function() {
+            // Vérifier la validité du formulaire avant de continuer
+            const form = document.getElementById('signupForm');
+            let isValid = true;
+
+            // Valider tous les champs visibles (étape 1)
+            const inputs = step1.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (!input.reportValidity()) {
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                // Animation de transition
+                step1.style.opacity = '1';
+                let opacity = 1;
+                const fadeOut = setInterval(() => {
+                    opacity -= 0.05;
+                    step1.style.opacity = opacity;
+                    if (opacity <= 0) {
+                        clearInterval(fadeOut);
+                        step1.classList.add('hidden');
+                        step2.classList.remove('hidden');
+                        step2.style.opacity = '0';
+
+                        // Animation d'apparition
+                        let fadeInOpacity = 0;
+                        const fadeIn = setInterval(() => {
+                            fadeInOpacity += 0.05;
+                            step2.style.opacity = fadeInOpacity;
+                            if (fadeInOpacity >= 1) {
+                                clearInterval(fadeIn);
+                            }
+                        }, 20);
+                    }
+                }, 20);
+            }
+        });
+
+        // Retour à l'étape 1
+        backBtn.addEventListener('click', function() {
+            // Animation similaire mais inverse
+            step2.style.opacity = '1';
+            let opacity = 1;
+            const fadeOut = setInterval(() => {
+                opacity -= 0.05;
+                step2.style.opacity = opacity;
+                if (opacity <= 0) {
+                    clearInterval(fadeOut);
+                    step2.classList.add('hidden');
+                    step1.classList.remove('hidden');
+                    step1.style.opacity = '0';
+
+                    let fadeInOpacity = 0;
+                    const fadeIn = setInterval(() => {
+                        fadeInOpacity += 0.05;
+                        step1.style.opacity = fadeInOpacity;
+                        if (fadeInOpacity >= 1) {
+                            clearInterval(fadeIn);
+                        }
+                    }, 20);
+                }
+            }, 20);
+        });
+    });
+</script>
 {% endblock %}
