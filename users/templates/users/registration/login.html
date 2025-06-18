@@ -5,8 +5,19 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg mt-10 transition-all duration-500 transform hover:shadow-xl">
-    <h2 class="text-3xl font-bold text-center text-blue-600 mb-6 transform hover:scale-105 transition-transform duration-300">Log In</h2>
+<div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-2xl mt-10 transition-all duration-500 transform hover:shadow-3xl">
+    <div class="flex justify-center mb-6">
+        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+        </div>
+    </div>
+
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8 relative">
+        Welcome Back
+        <span class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"></span>
+    </h2>
 
     <form method="post" class="space-y-6">
         {% csrf_token %}
@@ -14,7 +25,20 @@
         <!-- Floating Label Inputs -->
         {% for field in form %}
         <div class="relative z-0 group">
-            {{ field|add_class:"block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" }}
+            {% if field.name == 'password' %}
+                <div class="relative">
+                    {{ field|add_class:"block py-2.5 px-3 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-8" }}
+                    <button style="margin : 0 15px 0 0 " type="button" class="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none toggle-password">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+            {% else %}
+                {{ field|add_class:"block py-2.5 px-3 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" }}
+            {% endif %}
+
             <label for="{{ field.id_for_label }}"
                    class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                 {{ field.label }}
@@ -23,6 +47,18 @@
             {% for error in field.errors %}
                 <p class="mt-2 text-red-500 text-xs italic animate-pulse">{{ error }}</p>
             {% endfor %}
+
+            {% if field.help_text and field.name == 'password' %}
+                <div class="mt-2 text-xs text-gray-500 password-strength">
+                    <div class="flex items-center mb-1">
+                        <span class="strength-indicator mr-2"></span>
+                        <span class="strength-text"></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1">
+                        <div class="strength-bar h-1 rounded-full bg-gray-400"></div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
         {% endfor %}
 
@@ -34,26 +70,38 @@
         </div>
         {% endif %}
 
-        <button type="submit"
-                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
-            Log In
-        </button>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+            </div>
+
+            <button type="submit"
+                    class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                Log In
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
     </form>
 
-    <div class="mt-6 text-center space-y-3">
-        <p class="text-gray-600 text-sm">
-            Don't have an account?
-            <a href="{% url 'signup' %}" class="text-blue-600 hover:underline hover:text-blue-700 transition duration-200">
-                Sign up
-            </a>
-        </p>
-        <p class="text-gray-600 text-sm">
-            <a href="{% url 'password_reset' %}"
-               class="text-blue-600 hover:underline hover:text-blue-700 transition duration-200 relative group">
-                Forgot password?
-                <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-            </a>
-        </p>
+    <div class="mt-8 pt-5 border-t border-gray-200">
+        <div class="text-center space-y-3">
+            <p class="text-gray-600 text-sm">
+                Don't have an account?
+                <a href="{% url 'signup' %}" class="text-blue-600 hover:underline hover:text-blue-700 transition duration-200 font-medium">
+                    Sign up
+                </a>
+            </p>
+            <p class="text-gray-600 text-sm">
+                <a href="{% url 'password_reset' %}"
+                   class="text-blue-600 hover:underline hover:text-blue-700 transition duration-200 relative group font-medium">
+                    Forgot password?
+                    <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+            </p>
+        </div>
     </div>
 </div>
 
@@ -63,8 +111,11 @@
     input:focus ~ label {
         color: #2563eb; /* blue-600 */
         transform: translateY(-1.5rem) scale(0.75);
+        padding: 3px 8px;
     }
-
+    input {
+        padding: 8px 12px;
+    }
     /* Smooth transition for the form container */
     .animate-form {
         animation: fadeIn 0.5s ease-in-out;
@@ -73,6 +124,20 @@
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Password strength indicators */
+    .strength-weak {
+        background-color: #ef4444 !important; /* red-500 */
+    }
+    .strength-medium {
+        background-color: #f59e0b !important; /* amber-500 */
+    }
+    .strength-strong {
+        background-color: #10b981 !important; /* emerald-500 */
+    }
+    .strength-very-strong {
+        background-color: #3b82f6 !important; /* blue-500 */
     }
 </style>
 
@@ -92,6 +157,103 @@
                 this.parentElement.classList.remove('ring-2', 'ring-blue-200', 'rounded-lg');
             });
         });
+
+        // Toggle password visibility
+        const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+        togglePasswordButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                const icon = this.querySelector('svg');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+                } else {
+                    input.type = 'password';
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+                }
+            });
+        });
+
+        // Password strength checker
+        const passwordInput = document.querySelector('input[type="password"]');
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                const strengthBar = document.querySelector('.strength-bar');
+                const strengthText = document.querySelector('.strength-text');
+                const strengthIndicator = document.querySelector('.strength-indicator');
+
+                if (!strengthBar || !strengthText) return;
+
+                const password = this.value;
+                let strength = 0;
+
+                // Check password length
+                if (password.length > 0) strength += 1;
+                if (password.length >= 8) strength += 1;
+
+                // Check for mixed case
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
+
+                // Check for numbers
+                if (/\d/.test(password)) strength += 1;
+
+                // Check for special chars
+                if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+
+                // Update UI
+                let strengthLevel = '';
+                let width = '0%';
+                let colorClass = '';
+
+                switch(strength) {
+                    case 0:
+                        strengthLevel = '';
+                        width = '0%';
+                        break;
+                    case 1:
+                        strengthLevel = 'Very weak';
+                        width = '20%';
+                        colorClass = 'strength-weak';
+                        break;
+                    case 2:
+                        strengthLevel = 'Weak';
+                        width = '40%';
+                        colorClass = 'strength-weak';
+                        break;
+                    case 3:
+                        strengthLevel = 'Medium';
+                        width = '60%';
+                        colorClass = 'strength-medium';
+                        break;
+                    case 4:
+                        strengthLevel = 'Strong';
+                        width = '80%';
+                        colorClass = 'strength-strong';
+                        break;
+                    case 5:
+                        strengthLevel = 'Very strong';
+                        width = '100%';
+                        colorClass = 'strength-very-strong';
+                        break;
+                }
+
+                strengthBar.style.width = width;
+                strengthBar.className = `strength-bar h-1 rounded-full ${colorClass}`;
+                strengthText.textContent = strengthLevel;
+
+                // Update indicator icon
+                if (strength >= 4) {
+                    strengthIndicator.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>';
+                } else if (strength >= 2) {
+                    strengthIndicator.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>';
+                } else if (strength > 0) {
+                    strengthIndicator.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>';
+                } else {
+                    strengthIndicator.innerHTML = '';
+                }
+            });
+        }
     });
 </script>
 {% endblock %}
