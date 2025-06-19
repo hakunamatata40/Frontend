@@ -6,17 +6,34 @@
     <title>{% block title %}EHBLO{% endblock %}</title>
     {% load static %}
 
-    {# NEW: Favicon link for the browser tab title #}
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{% static 'images/logo.png' %}">
 
+    <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            @apply bg-gray-50; /* Apply default background color */
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #5b21b6;
+            --primary-light: #8b5cf6;
         }
-        /* Basic form styling to make default Django forms look better with Tailwind */
+
+        body {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            @apply bg-gradient-to-br from-gray-50 to-gray-100;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Form elements styling */
         input[type="text"],
         input[type="email"],
         input[type="password"],
@@ -24,145 +41,328 @@
         input[type="url"],
         textarea,
         select {
-            @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm; /* Changed focus ring/border to purple */
-        }
-        /* Style for required fields (optional, requires JS or custom template tags) */
-        label.required:after {
-            content: " *";
-            @apply text-red-500;
-        }
-        /* Spinner for loading state in payment form */
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #fff;
-            width: 24px;
-            height: 24px;
-            -webkit-animation: spin 1s linear infinite;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        @-webkit-keyframes spin {
-            0% { -webkit-transform: rotate(0deg); }
-            100% { -webkit-transform: rotate(360deg); }
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .min-h-screen-minus-header-footer {
-            min-height: calc(100vh - 120px); /* Adjust based on your header/footer height */
+            @apply block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200;
+            background-color: rgba(255, 255, 255, 0.8);
         }
 
-        /* Basic animations - if you're using a proper build tool, these go in CSS */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes bounceIn {
-            0% { transform: scale(0.9); opacity: 0; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); }
+        /* Buttons */
+        .btn-primary {
+            @apply bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-purple-300;
         }
 
-        .animate-fade-in-down { animation: fadeInDown 0.8s ease-out forwards; }
-        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
-        .animate-bounce-in { animation: bounceIn 0.5s ease-out; }
+        /* Navigation */
+        .desktop-nav {
+            @apply bg-gradient-to-r from-purple-700 to-purple-600 shadow-xl;
+            backdrop-filter: blur(10px);
+            background-color : purple;
+        }
+
+        .mobile-nav {
+            @apply fixed bottom-0 left-0 right-0 bg-white shadow-2xl border-t border-gray-200;
+            display: none;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            @apply flex flex-col items-center justify-center p-2 text-gray-700 hover:text-purple-600 transition-all duration-200;
+        }
+
+        .nav-item.active {
+            @apply text-purple-600;
+        }
+
+        .nav-icon {
+            @apply text-2xl mb-1;
+        }
+
+        .nav-text {
+            @apply text-xs;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Glassmorphism effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .desktop-nav {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            main {
+                padding-bottom: 80px; /* Space for mobile nav */
+            }
+        }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
-    <nav class="bg-purple-700 p-4 shadow-lg">
-        <div class="container mx-auto flex flex-wrap justify-between items-center">
-            <a href="{% url 'home' %}" class="text-white text-3xl font-extrabold rounded-lg p-2 hover:bg-purple-800 transition duration-300 flex items-center space-x-2">
-                <img src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-8 w-8 object-contain">
-                <span>EHBLO</span>
+<body class="flex flex-col">
+    <!-- Desktop Navigation (Top) -->
+    <nav class="desktop-nav p-4 sticky top-0 z-50 animate-slide-up">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{% url 'home' %}" class="flex items-center space-x-3">
+                <img src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-10 w-10 object-contain">
+                <span class="text-white text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">EHBLO</span>
             </a>
-            <button class="lg:hidden text-white focus:outline-none" onclick="document.getElementById('nav-menu').classList.toggle('hidden')">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
-            <div id="nav-menu" class="hidden lg:flex flex-grow lg:flex-grow-0 lg:items-center w-full lg:w-auto mt-4 lg:mt-0">
-                <div class="flex flex-col lg:flex-row lg:space-x-6 space-y-3 lg:space-y-0 lg:ml-auto">
-                    <a href="{% url 'course_list' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Courses</a>
-                    {% if user.is_authenticated %}
-                        {% if user.user_type == 'instructor' %}
-                            <a href="{% url 'instructor_dashboard' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Instructor Dashboard</a>
-                        {% endif %}
-                        <a href="{% url 'my_courses' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">My Courses</a>
-                        <a href="{% url 'my_chats' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">My Chats</a> {# ADDED: New chat link #}
-                        <a href="{% url 'profile' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Profile</a>
 
-                        <form action="{% url 'logout' %}" method="post" class="inline-block">
-                            {% csrf_token %}
-                            {# MODIFIED: Added profile picture beside the username in the logout button #}
-                            <button type="submit" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium cursor-pointer flex items-center space-x-2">
-                                {% if user.profile_picture %}
-                                    <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover border border-purple-300">
-                                {% else %}
-                                    {# Ensure you have this default_profile_pic.png in your static/images/ directory #}
-                                    <img src="{% static 'images/default_profile_pic.png' %}" alt="Default Profile" class="w-6 h-6 rounded-full object-cover border border-gray-300">
-                                {% endif %}
-                                <span>Logout ({{ user.username }})</span>
-                            </button>
-                        </form>
+            <div class="hidden lg:flex items-center space-x-6">
+                <a href="{% url 'course_list' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center">
+                    <i class="fas fa-book-open mr-2"></i> Courses
+                </a>
 
-                    {% else %}
-                        <a href="{% url 'login' %}" class="text-white hover:text-purple-200 p-2 rounded-lg hover:bg-purple-800 transition duration-300 font-medium">Login</a>
-                        <a href="{% url 'signup' %}" class="text-white bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-500 transition duration-300 font-medium">Sign Up</a>
+                {% if user.is_authenticated %}
+                    {% if user.user_type == 'instructor' %}
+                        <a href="{% url 'instructor_dashboard' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center">
+                            <i class="fas fa-chalkboard-teacher mr-2"></i> Instructor
+                        </a>
                     {% endif %}
-                </div>
+
+                    <a href="{% url 'my_courses' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center">
+                        <i class="fas fa-graduation-cap mr-2"></i> My Courses
+                    </a>
+
+                    <a href="{% url 'my_chats' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center">
+                        <i class="fas fa-comments mr-2"></i> Chats
+                    </a>
+
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 focus:outline-none">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-purple-300 shadow-md">
+                            {% else %}
+                                <img src="{% static 'images/default_profile_pic.png' %}" alt="Default Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-300 shadow-md">
+                            {% endif %}
+                        </button>
+
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50 hidden group-hover:block animate-fade-in">
+                            <a href="{% url 'profile' %}" class="block px-4 py-2 text-gray-800 hover:bg-purple-50 hover:text-purple-600 transition-all">
+                                <i class="fas fa-user-circle mr-2"></i> Profile
+                            </a>
+                            <form action="{% url 'logout' %}" method="post" class="block">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-left px-4 py-2 text-gray-800 hover:bg-purple-50 hover:text-purple-600 transition-all">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium">
+                        Login
+                    </a>
+                    <a href="{% url 'signup' %}" class="bg-white text-purple-600 px-6 py-2 rounded-lg font-medium hover:bg-purple-50 transition-all duration-200 shadow-md">
+                        Sign Up
+                    </a>
+                {% endif %}
             </div>
+
+            <button class="lg:hidden text-white text-2xl focus:outline-none" id="mobile-menu-button">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
 
-    <main class="container mx-auto mt-8 p-4 flex-grow">
+    <!-- Mobile Navigation (Bottom) - Hidden on desktop -->
+    <nav class="mobile-nav lg:hidden">
+        <div class="flex justify-around w-full py-3">
+            <a href="{% url 'course_list' %}" class="nav-item">
+                <i class="fas fa-book-open nav-icon"></i>
+                <span class="nav-text">Courses</span>
+            </a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'my_courses' %}" class="nav-item">
+                    <i class="fas fa-graduation-cap nav-icon"></i>
+                    <span class="nav-text">My Courses</span>
+                </a>
+
+                <a href="{% url 'my_chats' %}" class="nav-item">
+                    <i class="fas fa-comments nav-icon"></i>
+                    <span class="nav-text">Chats</span>
+                </a>
+
+                {% if user.user_type == 'instructor' %}
+                    <a href="{% url 'instructor_dashboard' %}" class="nav-item">
+                        <i class="fas fa-chalkboard-teacher nav-icon"></i>
+                        <span class="nav-text">Instructor</span>
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'profile' %}" class="nav-item">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover border border-purple-300">
+                    {% else %}
+                        <img src="{% static 'images/default_profile_pic.png' %}" alt="Default Profile" class="w-6 h-6 rounded-full object-cover border border-gray-300">
+                    {% endif %}
+                    <span class="nav-text">Profile</span>
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-item">
+                    <i class="fas fa-sign-in-alt nav-icon"></i>
+                    <span class="nav-text">Login</span>
+                </a>
+                <a href="{% url 'signup' %}" class="nav-item">
+                    <i class="fas fa-user-plus nav-icon"></i>
+                    <span class="nav-text">Sign Up</span>
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6">
         {% if messages %}
-            <ul class="mb-6 space-y-3">
+            <div class="mb-6 space-y-3 max-w-3xl mx-auto">
                 {% for message in messages %}
-                    <li class="p-3 rounded-lg flex items-center
-                        {% if message.tags == 'success' %} bg-green-100 text-green-800 border border-green-200
-                        {% elif message.tags == 'warning' %} bg-yellow-100 text-yellow-800 border border-yellow-200
-                        {% elif message.tags == 'error' %} bg-red-100 text-red-800 border border-red-200
-                        {% else %} bg-purple-100 text-purple-800 border border-purple-200
+                    <div class="p-4 rounded-xl flex items-start glass-card shadow-lg animate-fade-in
+                        {% if message.tags == 'success' %} border-l-4 border-green-500
+                        {% elif message.tags == 'warning' %} border-l-4 border-yellow-500
+                        {% elif message.tags == 'error' %} border-l-4 border-red-500
+                        {% else %} border-l-4 border-purple-500
                         {% endif %}">
-                        <svg class="w-5 h-5 mr-2
+                        <div class="mr-3 mt-1
                             {% if message.tags == 'success' %} text-green-500
                             {% elif message.tags == 'warning' %} text-yellow-500
                             {% elif message.tags == 'error' %} text-red-500
                             {% else %} text-purple-500
-                            {% endif %}"
-                            fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            {% endif %}">
                             {% if message.tags == 'success' %}
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                <i class="fas fa-check-circle text-xl"></i>
                             {% elif message.tags == 'warning' %}
-                                <path fill-rule="evenodd" d="M8.257 3.513A6.002 6.002 0 0110 4a6 6 0 016 6c0 1.258-.387 2.434-1.05 3.421C14.28 14.735 12.38 15.65 10 15.65c-2.38 0-4.28-.915-4.95-2.229C5.387 12.434 5 11.258 5 10a6.002 6.002 0 011.743-4.487zM10 12a1 1 0 100-2 1 1 0 000 2zm0-4a1 1 0 000-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                                <i class="fas fa-exclamation-triangle text-xl"></i>
                             {% elif message.tags == 'error' %}
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                <i class="fas fa-times-circle text-xl"></i>
                             {% else %}
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414L8.586 9l-1.293-1.293a1 1 0 00-1.414 1.414L7.586 10l-1.293 1.293a1 1 0 001.414 1.414L8.586 11l1.293-1.293a1 1 0 001.414-1.414L10.414 10l1.293-1.293z" clip-rule="evenodd"></path>
+                                <i class="fas fa-info-circle text-xl"></i>
                             {% endif %}
-                        </svg>
-                        {{ message }}
-                    </li>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-medium
+                                {% if message.tags == 'success' %} text-green-800
+                                {% elif message.tags == 'warning' %} text-yellow-800
+                                {% elif message.tags == 'error' %} text-red-800
+                                {% else %} text-purple-800
+                                {% endif %}">
+                                {{ message }}
+                            </p>
+                        </div>
+                        <button class="ml-2 text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% endif %}
+
         {% block content %}
         {% endblock %}
     </main>
 
-    <footer class="bg-gray-800 text-white p-6 mt-auto">
-        <div class="container mx-auto text-center">
-            <p>&copy; {% now "Y" %} EHBLO. All rights reserved.</p>
-            <div class="mt-3 space-x-4 text-sm">
-                <a href="#" class="text-gray-400 hover:text-white transition duration-300">Privacy Policy</a>
-                <a href="#" class="text-gray-400 hover:text-white transition duration-300">Terms of Use</a>
-                <a href="{% url 'admin:index' %}" class="text-gray-400 hover:text-white transition duration-300">Admin</a>
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-purple-800 to-purple-700 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
+                        <img src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-8 w-8 object-contain">
+                        <span class="text-xl font-bold">EHBLO</span>
+                    </a>
+                    <p class="mt-2 text-purple-200 max-w-md">
+                        Empowering your learning journey with the best online courses and interactive experiences.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Quick Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="{% url 'course_list' %}" class="text-purple-200 hover:text-white transition">Courses</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition">Pricing</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition">About Us</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Support</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-purple-200 hover:text-white transition">Help Center</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition">Contact Us</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition">FAQs</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-span-2 md:col-span-1">
+                        <h3 class="text-lg font-semibold mb-3">Legal</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-purple-200 hover:text-white transition">Privacy Policy</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition">Terms of Service</a></li>
+                            <li><a href="{% url 'admin:index' %}" class="text-purple-200 hover:text-white transition">Admin</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-purple-600 mt-8 pt-6 text-center text-purple-300">
+                <p>&copy; {% now "Y" %} EHBLO. All rights reserved.</p>
+                <div class="flex justify-center space-x-4 mt-3">
+                    <a href="#" class="text-xl text-purple-300 hover:text-white transition"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-xl text-purple-300 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-xl text-purple-300 hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-xl text-purple-300 hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+                </div>
             </div>
         </div>
     </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Toggle mobile menu for desktop nav (only shown on small screens before mobile nav takes over)
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.querySelector('.desktop-nav .lg\\:hidden');
+            if (menu) {
+                menu.classList.toggle('hidden');
+                menu.classList.toggle('flex');
+            }
+        });
+
+        // Set active nav item based on current page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.nav-item');
+
+            navItems.forEach(item => {
+                if (item.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

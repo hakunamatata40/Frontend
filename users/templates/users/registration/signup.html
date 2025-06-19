@@ -6,30 +6,26 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto bg-white p-4 sm:p-8 rounded-lg shadow-md mt-4 sm:mt-10">
-    <!-- Indicateur d'étapes -->
+    <!-- Indicateur d'étapes - Version améliorée -->
     <div class="mb-8">
         <div class="flex items-center justify-between relative">
-            <!-- Ligne de progression -->
-            <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2 z-0"></div>
-            <div id="progressBar" class="absolute top-1/2 left-0 h-1 bg-blue-600 -translate-y-1/2 z-10 transition-all duration-500" style="width: 25%"></div>
+            <!-- Ligne de progression (placée au centre des bulles) -->
+            <div class="absolute top-1/2 left-0 right-0 h-[4px] bg-gray-200 -translate-y-1/2 z-0"></div>
+            <div id="progressBar" class="absolute top-1/2 left-0 h-[4px] bg-blue-600 -translate-y-1/2 z-10 transition-all duration-500" style="width: 25%"></div>
 
-            <!-- Étapes -->
-            <div class="step relative z-20 text-center" data-step="1">
-                <div class="w-8 h-8 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mb-2">1</div>
-                <span class="text-xs sm:text-sm font-medium text-blue-600">Informations de base</span>
+            <!-- Étapes - Bulles 1 à 4 avec la barre passant derrière -->
+            {% for step in "1234" %}
+            <div class="step relative z-20 text-center" data-step="{{ forloop.counter }}">
+                <div class="w-10 h-10 mx-auto rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md transition-all duration-300
+                    {% if forloop.counter == 1 %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-600{% endif %}">
+                    {{ forloop.counter }}
+                </div>
+                <span class="block mt-2 text-xs sm:text-sm font-medium
+                    {% if forloop.counter == 1 %}text-blue-600{% else %}text-gray-500{% endif %}">
+                    {% if forloop.counter == 1 %}Informations{% elif forloop.counter == 2 %}Profil{% elif forloop.counter == 3 %}Intérêts{% else %}Confirmation{% endif %}
+                </span>
             </div>
-            <div class="step relative z-20 text-center" data-step="2">
-                <div class="w-8 h-8 mx-auto rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2">2</div>
-                <span class="text-xs sm:text-sm font-medium text-gray-500">Profil</span>
-            </div>
-            <div class="step relative z-20 text-center" data-step="3">
-                <div class="w-8 h-8 mx-auto rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2">3</div>
-                <span class="text-xs sm:text-sm font-medium text-gray-500">Intérêts</span>
-            </div>
-            <div class="step relative z-20 text-center" data-step="4">
-                <div class="w-8 h-8 mx-auto rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2">4</div>
-                <span class="text-xs sm:text-sm font-medium text-gray-500">Confirmation</span>
-            </div>
+            {% endfor %}
         </div>
     </div>
 
@@ -118,7 +114,12 @@
             {% endif %}
         {% endfor %}
     </div>
-
+    <div class="mb-3 sm:mb-4">
+        <label for="id_pedagogic_level" class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">
+            Niveau pédagogique <span class="text-red-500">*</span>
+        </label>
+        {{ form.pedagogic_level|add_class:"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm" }}
+    </div>
     <div class="flex justify-between">
         <button type="button" class="prev-step-btn bg-gray-200 text-gray-800 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition duration-300 text-sm sm:text-base">
             Retour
@@ -130,6 +131,8 @@
 </div>
 
         <!-- Étape 3 - Intérêts -->
+
+
         <div id="step3" class="step-content hidden">
             <h2 class="text-2xl sm:text-3xl font-bold text-center text-blue-600 mb-4 sm:mb-6">Vos centres d'intérêt</h2>
             <p class="text-center text-gray-600 mb-6 text-sm sm:text-base">Sélectionnez ce qui vous intéresse (3 minimum)</p>
@@ -190,7 +193,7 @@
             </div>
 
             <div class="flex items-center mb-4">
-                <input type="checkbox" id="terms" name="terms" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <input type="checkbox" id="terms" name="terms" required class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                 <label for="terms" class="text-sm text-gray-700">
                     J'accepte les <a href="#" class="text-blue-600 hover:underline">conditions d'utilisation</a> et la <a href="#" class="text-blue-600 hover:underline">politique de confidentialité</a>
                 </label>
@@ -200,7 +203,7 @@
                 <button type="button" class="prev-step-btn bg-gray-200 text-gray-800 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition duration-300 text-sm sm:text-base">
                     Retour
                 </button>
-                <button type="submit" form="signupForm" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-300 text-sm sm:text-base">
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-300 text-sm sm:text-base">
                     Confirmer l'inscription
                 </button>
             </div>
@@ -209,25 +212,44 @@
 </div>
 
 <style>
+
+    <style>
+    /* Styles pour la barre de progression améliorée */
+    .step {
+        flex: 1;
+        position: relative;
+    }
+
+    .step div:first-child {
+        position: relative;
+        z-index: 20;
+        transition: all 0.3s ease;
+    }
+
+    .step.active div:first-child {
+        background-color: #3b82f6 !important;
+        color: white !important;
+        transform: scale(1.1);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px #3b82f6;
+    }
+
+    .step.active span {
+        color: #3b82f6;
+        font-weight: 600;
+    }
+
+    /* Animation pour les transitions entre étapes */
+    .step-content {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Styles existants pour les cartes d'intérêt */
     .interest-card input:checked + div {
         background-color: #3b82f6;
         color: white;
         border-color: #3b82f6;
         transform: scale(1.05);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-
-    .step-content {
-        transition: all 0.3s ease;
-    }
-
-    /* Animation pour les étapes actives */
-    .step.active div:first-child {
-        background-color: #3b82f6;
-        color: white;
-    }
-    .step.active span {
-        color: #3b82f6;
     }
 
     @media (max-width: 640px) {
@@ -253,6 +275,8 @@
     #id_profile_picture + label svg {
         transition: transform 0.3s ease;
     }
+
+
 </style>
 
 <script>
@@ -288,23 +312,21 @@
             });
         });
 
-        // Fonction pour valider l'étape actuelle
+        /// Modifiez la fonction validateStep
         function validateStep(step) {
             let isValid = true;
-
-            // Valider seulement les champs visibles
             const currentStepContent = document.getElementById(`step${step}`);
-            const inputs = currentStepContent.querySelectorAll('input[required], select[required], textarea[required]');
 
-            inputs.forEach(input => {
-                if (!input.reportValidity()) {
-                    // Faire apparaître les messages d'erreur
+            // Ne valider que les champs REQUIRED
+            const requiredInputs = currentStepContent.querySelectorAll('[required]');
+
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
                     input.reportValidity();
                     isValid = false;
                 }
             });
 
-            // Validation spéciale pour les intérêts (étape 3)
             if (step === 3) {
                 const checkedInterests = document.querySelectorAll('#step3 input[type="checkbox"]:checked');
                 if (checkedInterests.length < 3) {
@@ -313,7 +335,6 @@
                 }
             }
 
-            // Préparer l'aperçu pour l'étape 4
             if (step === 3 && isValid) {
                 prepareReview();
             }

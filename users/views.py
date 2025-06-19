@@ -1,15 +1,28 @@
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.views import LoginView
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm # Ensure this is used for signup
 from .models import CustomUser # Ensure this is your custom user model
 
+
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy('login') # Redirect to login after successful signup
+    success_url = reverse_lazy('login')  # Redirection vers la page de connexion
     template_name = 'users/registration/signup.html'
+
+    def form_valid(self, form):
+        # Sauvegarde de l'utilisateur
+        user = form.save()
+
+        # Message de succès
+        messages.success(
+            self.request,
+            'Inscription réussie ! Vous pouvez maintenant vous connecter.'
+        )
+        return super().form_valid(form)
 
 class CustomLoginView(LoginView):
     template_name = 'users/registration/login.html'

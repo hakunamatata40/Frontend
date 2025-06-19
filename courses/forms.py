@@ -1,8 +1,15 @@
 # courses/forms.py
 from django import forms
 from django.forms import inlineformset_factory
+
+from users.models import CustomUser
 from .models import Course, Module, Content, TextContent, VideoContent, ImageContent, FileContent, Subject
 from taggit.forms import TagWidget # Import TagWidget for better tag display/input
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from courses.models import Subject
+
+
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -100,3 +107,30 @@ class ContentForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500'}),
             'order': forms.NumberInput(attrs={'min': 0, 'class': 'w-full p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500'}),
         }
+
+
+class CustomUserCreationForm(UserCreationForm):
+    user_type = forms.ChoiceField(choices=CustomUser.USER_TYPE_CHOICES, initial="student", label="I am a:")
+    email = forms.EmailField(required=True, label="Email Address")
+
+    first_name = forms.CharField(required=True, label="First Name")
+    last_name = forms.CharField(required=True, label="Last Name")
+
+    pedagogic_level = forms.ChoiceField(
+        choices=CustomUser.PEDAGOGIC_LEVEL_CHOICES,
+        label="Your Pedagogic Level",
+        required=True
+    )
+    interests = forms.ModelMultipleChoiceField(
+        queryset=Subject.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        label="Your Interests (Select all that apply)",
+        required=False,
+    )
+
+    class Meta(UserCreationForm.Meta):
+        model = CustomUser
+        fields = ('username', 'email', 'password1', 'password2',
+                  'first_name', 'last_name', 'user_type',
+                  'pedagogic_level', 'interests', 'bio',
+                  'profile_picture', 'phone_number', 'country')
