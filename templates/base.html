@@ -1,368 +1,141 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}EHBLO{% endblock %}</title>
-    {% load static %}
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'images/logo.png' %}">
-
-    <!-- Tailwind CSS -->
+    <title>EHBLO</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        :root {
-            --primary: #7c3aed;
-            --primary-dark: #5b21b6;
-            --primary-light: #8b5cf6;
-        }
-
-        body {
-            font-family: 'Poppins', 'Inter', sans-serif;
-            @apply bg-gradient-to-br from-gray-50 to-gray-100;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Form elements styling */
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="number"],
-        input[type="url"],
-        textarea,
-        select {
-            @apply block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200;
-            background-color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* Buttons */
-        .btn-primary {
-            @apply bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-purple-300;
-        }
-
-        /* Navigation */
-        .desktop-nav {
-            @apply bg-gradient-to-r from-purple-700 to-purple-600 shadow-xl;
-            backdrop-filter: blur(10px);
-            background-color : purple;
-        }
-
-        .mobile-nav {
-            @apply absolute bottom-0 left-0 right-0 bg-white shadow-2xl border-t border-gray-200;
-            display: none;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            @apply flex flex-col items-center justify-center p-2 text-gray-700 hover:text-purple-600 transition-all duration-200;
-        }
-
-        .nav-item.active {
-            @apply text-purple-600;
-        }
-
-        .nav-icon {
-            @apply text-2xl mb-1;
-        }
-
-        .nav-text {
-            @apply text-xs;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideInUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        .animate-slide-up {
-            animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Glassmorphism effect */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 1024px) {
-            .desktop-nav {
-                display: none;
-            }
-
-            .mobile-nav {
-                display: flex;
-            }
-
-            main {
-                padding-bottom: 80px; /* Space for mobile nav */
-            }
-        }
-    </style>
 </head>
-<body class="flex flex-col">
-    <!-- Desktop Navigation (Top) -->
-    <nav class="desktop-nav p-4 sticky top-0 z-50 animate-slide-up">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="{% url 'home' %}" class="flex items-center space-x-3">
-                <img src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-10 w-10 object-contain">
-                <span class="text-white text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">EHBLO</span>
-            </a>
-
-            <div class="hidden lg:flex items-center space-x-6">
-                <a href="{% url 'course_list' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center">
-                    <i class="fas fa-book-open mr-2"></i> Courses
-                </a>
-
-                {% if user.is_authenticated %}
-                    {% if user.user_type == 'instructor' %}
-                        <a href="{% url 'instructor_dashboard' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center">
-                            <i class="fas fa-chalkboard-teacher mr-2"></i> Instructor
-                        </a>
-                    {% endif %}
-
-                    <a href="{% url 'my_courses' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center">
-                        <i class="fas fa-graduation-cap mr-2"></i> My Courses
-                    </a>
-
-                    <a href="{% url 'my_chats' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium flex items-center">
-                        <i class="fas fa-comments mr-2"></i> Chats
-                    </a>
-
-                    <div class="relative group">
-                        <button class="flex items-center space-x-2 focus:outline-none">
-                            {% if user.profile_picture %}
-                                <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-purple-300 shadow-md">
-                            {% else %}
-                                <img src="{% static 'images/default_profile_pic.png' %}" alt="Default Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-300 shadow-md">
-                            {% endif %}
-                        </button>
-
-                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50 hidden group-hover:block animate-fade-in">
-                            <a href="{% url 'profile' %}" class="block px-4 py-2 text-gray-800 hover:bg-purple-50 hover:text-purple-600 transition-all">
-                                <i class="fas fa-user-circle mr-2"></i> Profile
-                            </a>
-                            <form action="{% url 'logout' %}" method="post" class="block">
-                                {% csrf_token %}
-                                <button type="submit" class="w-full text-left px-4 py-2 text-gray-800 hover:bg-purple-50 hover:text-purple-600 transition-all">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                {% else %}
-                    <a href="{% url 'login' %}" class="text-white hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 font-medium">
-                        Login
-                    </a>
-                    <a href="{% url 'signup' %}" class="bg-white text-purple-600 px-6 py-2 rounded-lg font-medium hover:bg-purple-50 transition-all duration-200 shadow-md">
-                        Sign Up
-                    </a>
-                {% endif %}
-            </div>
-
-            <button class="lg:hidden text-white text-2xl focus:outline-none" id="mobile-menu-button">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Mobile Navigation (Bottom) - Hidden on desktop -->
-    <nav class="mobile-nav lg:hidden">
-        <div class="flex justify-around w-full py-3">
-            <a href="{% url 'course_list' %}" class="nav-item">
-                <i class="fas fa-book-open nav-icon"></i>
-                <span class="nav-text">Courses</span>
-            </a>
-
+<body class="flex flex-col min-h-screen bg-gray-100">
+    <!-- Desktop Navbar -->
+    <nav class="hidden md:flex bg-white shadow-md p-4 justify-between items-center">
+        <div style="display : flex;" class="text-2xl font-bold text-purple-600"><img style="margin : 0 30px 0 0 ; height: 30px; width : 30px;" src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-8 w-8 object-contain">
+       EHBLO</div>
+        <div class="flex space-x-6 items-center">
+            <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600">Courses</a>
             {% if user.is_authenticated %}
-                <a href="{% url 'my_courses' %}" class="nav-item">
-                    <i class="fas fa-graduation-cap nav-icon"></i>
-                    <span class="nav-text">My Courses</span>
-                </a>
-
-                <a href="{% url 'my_chats' %}" class="nav-item">
-                    <i class="fas fa-comments nav-icon"></i>
-                    <span class="nav-text">Chats</span>
-                </a>
-
                 {% if user.user_type == 'instructor' %}
-                    <a href="{% url 'instructor_dashboard' %}" class="nav-item">
-                        <i class="fas fa-chalkboard-teacher nav-icon"></i>
-                        <span class="nav-text">Instructor</span>
-                    </a>
+                    <a href="{% url 'instructor_dashboard' %}" class="text-gray-700 hover:text-blue-600">Instructor</a>
                 {% endif %}
-
-                <a href="{% url 'profile' %}" class="nav-item">
-                    {% if user.profile_picture %}
-                        <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover border border-purple-300">
-                    {% else %}
-                        <img src="{% static 'images/default_profile_pic.png' %}" alt="Default Profile" class="w-6 h-6 rounded-full object-cover border border-gray-300">
-                    {% endif %}
-                    <span class="nav-text">Profile</span>
-                </a>
+                <a href="{% url 'my_courses' %}" class="text-gray-700 hover:text-blue-600">My Courses</a>
+                <a href="{% url 'my_chats' %}" class="text-gray-700 hover:text-blue-600">Chats</a>
+                <div class="relative group">
+                    <div class="flex items-center space-x-2 cursor-pointer">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-8 h-8 rounded-full">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white">U</div>
+                        {% endif %}
+                        <span class="text-gray-700">Profile</span>
+                    </div>
+                    <div class="absolute hidden group-hover:block bg-white shadow-md rounded-md p-4 mt-2 right-0">
+                        <a href="{% url 'profile' %}" class="block text-gray-700 hover:text-blue-600">Profile</a>
+                        <form action="{% url 'logout' %}" method="post" class="mt-2">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-600 hover:text-red-800">Logout</button>
+                        </form>
+                    </div>
+                </div>
             {% else %}
-                <a href="{% url 'login' %}" class="nav-item">
-                    <i class="fas fa-sign-in-alt nav-icon"></i>
-                    <span class="nav-text">Login</span>
-                </a>
-                <a href="{% url 'signup' %}" class="nav-item">
-                    <i class="fas fa-user-plus nav-icon"></i>
-                    <span class="nav-text">Sign Up</span>
-                </a>
+                <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-600">Login</a>
+                <a href="{% url 'signup' %}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Sign Up</a>
             {% endif %}
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-6">
-        {% if messages %}
-            <div class="mb-6 space-y-3 max-w-3xl mx-auto">
-                {% for message in messages %}
-                    <div class="p-4 rounded-xl flex items-start glass-card shadow-lg animate-fade-in
-                        {% if message.tags == 'success' %} border-l-4 border-green-500
-                        {% elif message.tags == 'warning' %} border-l-4 border-yellow-500
-                        {% elif message.tags == 'error' %} border-l-4 border-red-500
-                        {% else %} border-l-4 border-purple-500
-                        {% endif %}">
-                        <div class="mr-3 mt-1
-                            {% if message.tags == 'success' %} text-green-500
-                            {% elif message.tags == 'warning' %} text-yellow-500
-                            {% elif message.tags == 'error' %} text-red-500
-                            {% else %} text-purple-500
-                            {% endif %}">
-                            {% if message.tags == 'success' %}
-                                <i class="fas fa-check-circle text-xl"></i>
-                            {% elif message.tags == 'warning' %}
-                                <i class="fas fa-exclamation-triangle text-xl"></i>
-                            {% elif message.tags == 'error' %}
-                                <i class="fas fa-times-circle text-xl"></i>
-                            {% else %}
-                                <i class="fas fa-info-circle text-xl"></i>
-                            {% endif %}
-                        </div>
-                        <div class="flex-grow">
-                            <p class="font-medium
-                                {% if message.tags == 'success' %} text-green-800
-                                {% elif message.tags == 'warning' %} text-yellow-800
-                                {% elif message.tags == 'error' %} text-red-800
-                                {% else %} text-purple-800
-                                {% endif %}">
-                                {{ message }}
-                            </p>
-                        </div>
-                        <button class="ml-2 text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                {% endfor %}
+    <!-- Mobile Navbar (Fixed Bottom) -->
+    <nav style ="z-index:1000;" class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md p-4 flex justify-around items-center border-t">
+        <a href="{% url 'my_courses' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"></path></svg>
+            <span class="text-sm">Courses</span>
+        </a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'my_courses' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span class="text-sm">My Courses</span>
+            </a>
+            <a href="{% url 'my_chats' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                <span class="text-sm">Chats</span>
+            </a>
+            {% if user.user_type == 'instructor' %}
+                <a href="{% url 'instructor_dashboard' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <span class="text-sm">Instructor</span>
+                </a>
+            {% endif %}
+            <div class="flex flex-col items-center text-gray-700 hover:text-blue-600">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full">
+                {% else %}
+                    <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs">U</div>
+                {% endif %}
+                <span class="text-sm">Profile</span>
             </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14"></path></svg>
+                <span class="text-sm">Login</span>
+            </a>
+            <a href="{% url 'signup' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <span class="text-sm">Sign Up</span>
+            </a>
         {% endif %}
+    </nav>
 
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mx-auto px-4 mt-4">
+            {% for message in messages %}
+                <div class="p-4 rounded-md mb-4 flex items-center justify-between {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                    <div>{{ message }}</div>
+                    <button class="text-gray-500 hover:text-gray-700" onclick="this.parentElement.remove()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
         {% block content %}
         {% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gradient-to-r from-purple-800 to-purple-700 text-white py-8">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-6 md:mb-0">
-                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
-                        <img src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-8 w-8 object-contain">
-                        <span class="text-xl font-bold">EHBLO</span>
-                    </a>
-                    <p class="mt-2 text-purple-200 max-w-md">
-                        Empowering your learning journey with the best online courses and interactive experiences.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-3">Quick Links</h3>
-                        <ul class="space-y-2">
-                            <li><a href="{% url 'course_list' %}" class="text-purple-200 hover:text-white transition">Courses</a></li>
-                            <li><a href="#" class="text-purple-200 hover:text-white transition">Pricing</a></li>
-                            <li><a href="#" class="text-purple-200 hover:text-white transition">About Us</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 class="text-lg font-semibold mb-3">Support</h3>
-                        <ul class="space-y-2">
-                            <li><a href="#" class="text-purple-200 hover:text-white transition">Help Center</a></li>
-                            <li><a href="#" class="text-purple-200 hover:text-white transition">Contact Us</a></li>
-                            <li><a href="#" class="text-purple-200 hover:text-white transition">FAQs</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="col-span-2 md:col-span-1">
-                        <h3 class="text-lg font-semibold mb-3">Legal</h3>
-                        <ul class="space-y-2">
-                            <li><a href="#" class="text-purple-200 hover:text-white transition">Privacy Policy</a></li>
-                            <li><a href="#" class="text-purple-200 hover:text-white transition">Terms of Service</a></li>
-                            <li><a href="{% url 'admin:index' %}" class="text-purple-200 hover:text-white transition">Admin</a></li>
-                        </ul>
-                    </div>
-                </div>
+    <footer class="bg-gray-800 text-white p-8">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-lg font-bold mb-4">EHBLO</h3>
+                <p>Empowering your learning journey with the best online courses and interactive experiences.</p>
             </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="{% url 'my_courses' %}" class="hover:text-blue-400">Courses</a></li>
 
-            <div class="border-t border-purple-600 mt-8 pt-6 text-center text-purple-300">
-                <p>&copy; {% now "Y" %} EHBLO. All rights reserved.</p>
-                <div class="flex justify-center space-x-4 mt-3">
-                    <a href="#" class="text-xl text-purple-300 hover:text-white transition"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="text-xl text-purple-300 hover:text-white transition"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-xl text-purple-300 hover:text-white transition"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="text-xl text-purple-300 hover:text-white transition"><i class="fab fa-linkedin"></i></a>
-                </div>
+
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4">Support</h3>
+                <ul class="space-y-2">
+
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4">Legal</h3>
+                <ul class="space-y-2">
+
+                </ul>
             </div>
         </div>
+        <div class="text-center mt-8">
+            <p>© {% now "Y" %} EHBLO. All rights reserved.</p>
+        </div>
     </footer>
-
-    <!-- Scripts -->
-    <script>
-        // Toggle mobile menu for desktop nav (only shown on small screens before mobile nav takes over)
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const menu = document.querySelector('.desktop-nav .lg\\:hidden');
-            if (menu) {
-                menu.classList.toggle('hidden');
-                menu.classList.toggle('flex');
-            }
-        });
-
-        // Set active nav item based on current page
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
-            const navItems = document.querySelectorAll('.nav-item');
-
-            navItems.forEach(item => {
-                if (item.getAttribute('href') === currentPath) {
-                    item.classList.add('active');
-                }
-            });
-        });
-    </script>
 </body>
 </html>

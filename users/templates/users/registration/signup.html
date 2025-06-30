@@ -211,7 +211,7 @@
     </form>
 </div>
 
-<style>
+
 
     <style>
     /* Styles pour la barre de progression améliorée */
@@ -281,83 +281,146 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Éléments du DOM
         const form = document.getElementById('signupForm');
         const progressBar = document.getElementById('progressBar');
         const steps = document.querySelectorAll('.step');
         const stepContents = document.querySelectorAll('.step-content');
         const nextButtons = document.querySelectorAll('.next-step-btn');
         const prevButtons = document.querySelectorAll('.prev-step-btn');
+        const submitButton = document.querySelector('#step4 button[type="submit"]');
+        const profilePicInput = document.getElementById('id_profile_picture');
+        const avatarPreview = document.getElementById('avatarPreview');
         let currentStep = 1;
 
         // Initialisation
         updateProgress();
+        setupEventListeners();
 
-        // Gestion des boutons Suivant
-        nextButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                if (validateStep(currentStep)) {
-                    currentStep++;
-                    updateProgress();
-                    showStep(currentStep);
-                }
+        function setupEventListeners() {
+            // Boutons Suivant
+            nextButtons.forEach(button => {
+                button.addEventListener('click', goToNextStep);
             });
-        });
 
-        // Gestion des boutons Retour
-        prevButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                currentStep--;
+            // Boutons Retour
+            prevButtons.forEach(button => {
+                button.addEventListener('click', goToPrevStep);
+            });
+
+            // Soumission du formulaire
+            submitButton.addEventListener('click', handleFormSubmission);
+
+            // Upload de photo de profil
+            if (profilePicInput) {
+                profilePicInput.addEventListener('change', handleProfilePictureUpload);
+            }
+        }
+
+        function goToNextStep() {
+            if (validateCurrentStep()) {
+                currentStep++;
                 updateProgress();
                 showStep(currentStep);
-            });
-        });
-
-        /// Modifiez la fonction validateStep
-        function validateStep(step) {
-            let isValid = true;
-            const currentStepContent = document.getElementById(`step${step}`);
-
-            // Ne valider que les champs REQUIRED
-            const requiredInputs = currentStepContent.querySelectorAll('[required]');
-
-            requiredInputs.forEach(input => {
-                if (!input.value.trim()) {
-                    input.reportValidity();
-                    isValid = false;
-                }
-            });
-
-            if (step === 3) {
-                const checkedInterests = document.querySelectorAll('#step3 input[type="checkbox"]:checked');
-                if (checkedInterests.length < 3) {
-                    alert('Veuillez sélectionner au moins 3 centres d\'intérêt');
-                    isValid = false;
+                
+                // Si on arrive à l'étape 4, préparer l'aperçu
+                if (currentStep === 4) {
+                    prepareReview();
                 }
             }
+        }
 
-            if (step === 3 && isValid) {
-                prepareReview();
+        function goToPrevStep() {
+            currentStep--;
+            updateProgress();
+            showStep(currentStep);
+        }
+
+        function validateCurrentStep() {
+            let isValid = true;
+            const currentStepContent = document.getElementById(`step${currentStep}`);
+            
+            // Validation spécifique à chaque étape
+            switch(currentStep) {
+                case 1:
+                    isValid = validateStep1();
+                    break;
+                case 2:
+                    isValid = validateStep2();
+                    break;
+                case 3:
+                    isValid = validateStep3();
+                    break;
             }
 
             return isValid;
         }
 
-        // Fonction pour afficher l'étape spécifique
+        function validateStep1() {
+            let isValid = true;
+            const requiredFields = ['username', 'email', 'password1', 'password2'];
+            
+            requiredFields.forEach(fieldName => {
+                const field = form.querySelector(`[name="${fieldName}"]`);
+                if (field && !field.value.trim()) {
+                    field.reportValidity();
+                    isValid = false;
+                }
+            });
+
+            // Vérification que les mots de passe correspondent
+            const password1 = form.querySelector('[name="password1"]').value;
+            const password2 = form.querySelector('[name="password2"]').value;
+            
+            if (password1 !== password2) {
+                alert("Les mots de passe ne correspondent pas");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function validateStep2() {
+            let isValid = true;
+            const requiredFields = ['first_name', 'last_name', 'pedagogic_level'];
+            
+            requiredFields.forEach(fieldName => {
+                const field = form.querySelector(`[name="${fieldName}"]`);
+                if (field && !field.value.trim()) {
+                    field.reportValidity();
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        }
+
+        function validateStep3() {
+            const checkedInterests = document.querySelectorAll('#step3 input[type="checkbox"]:checked');
+            if (checkedInterests.length < 3) {
+                alert('Veuillez sélectionner au moins 3 centres d\'intérêt');
+                return false;
+            }
+            return true;
+        }
+
         function showStep(step) {
+            // Animation de transition
             stepContents.forEach(content => {
+                content.style.opacity = '0';
+                content.style.transform = 'translateY(20px)';
                 content.classList.add('hidden');
             });
-            document.getElementById(`step${step}`).classList.remove('hidden');
 
-            // Animation douce
-            document.getElementById(`step${step}`).style.opacity = '0';
-            document.getElementById(`step${step}`).style.transform = 'translateY(10px)';
-
+            const currentContent = document.getElementById(`step${step}`);
+            currentContent.classList.remove('hidden');
+            
+            // Animation d'apparition
             let opacity = 0;
             const fadeIn = setInterval(() => {
                 opacity += 0.05;
-                document.getElementById(`step${step}`).style.opacity = opacity;
-                document.getElementById(`step${step}`).style.transform = `translateY(${10 - (10 * opacity)}px)`;
+                currentContent.style.opacity = opacity;
+                currentContent.style.transform = `translateY(${20 - (20 * opacity)}px)`;
 
                 if (opacity >= 1) {
                     clearInterval(fadeIn);
@@ -365,72 +428,97 @@
             }, 20);
         }
 
-        // Fonction pour mettre à jour la barre de progression
         function updateProgress() {
+            // Mise à jour de la barre de progression
             const progressPercentage = (currentStep - 1) / (steps.length - 1) * 100;
             progressBar.style.width = `${progressPercentage}%`;
 
-            // Mettre à jour les indicateurs d'étape
+            // Mise à jour des indicateurs d'étape
             steps.forEach((step, index) => {
-                if (index < currentStep) {
-                    step.classList.add('active');
+                const stepNumber = index + 1;
+                const stepElement = step.querySelector('div');
+                const stepLabel = step.querySelector('span');
+
+                if (stepNumber < currentStep) {
+                    // Étape complétée
+                    stepElement.className = 'w-10 h-10 mx-auto rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md bg-green-500 text-white';
+                } else if (stepNumber === currentStep) {
+                    // Étape actuelle
+                    stepElement.className = 'w-10 h-10 mx-auto rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md bg-blue-600 text-white';
                 } else {
-                    step.classList.remove('active');
+                    // Étape future
+                    stepElement.className = 'w-10 h-10 mx-auto rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md bg-gray-200 text-gray-600';
                 }
+
+                // Mise à jour du label
+                stepLabel.className = `block mt-2 text-xs sm:text-sm font-medium ${
+                    stepNumber <= currentStep ? 'text-blue-600 font-semibold' : 'text-gray-500'
+                }`;
             });
         }
 
-        // Fonction pour préparer l'aperçu de confirmation
         function prepareReview() {
-            // Récupérer les valeurs du formulaire
-            const firstName = document.querySelector('input[name="first_name"]')?.value || '-';
-            const lastName = document.querySelector('input[name="last_name"]')?.value || '-';
-            const email = document.querySelector('input[name="email"]')?.value || '-';
-            const birthDate = document.querySelector('input[name="birth_date"]')?.value || '-';
+            // Récupération des valeurs
+            const firstName = form.querySelector('[name="first_name"]').value || '-';
+            const lastName = form.querySelector('[name="last_name"]').value || '-';
+            const email = form.querySelector('[name="email"]').value || '-';
+            const birthDate = form.querySelector('[name="birth_date"]').value || '-';
+            const pedagogicLevel = form.querySelector('[name="pedagogic_level"]');
+            const pedagogicLevelText = pedagogicLevel ? pedagogicLevel.options[pedagogicLevel.selectedIndex].text : '-';
 
-            // Récupérer les intérêts sélectionnés
+            // Récupération des intérêts sélectionnés
             const checkedInterests = document.querySelectorAll('#step3 input[type="checkbox"]:checked');
             const interestsLabels = Array.from(checkedInterests).map(checkbox => {
-                return checkbox.parentElement.querySelector('span').textContent;
+                return checkbox.nextElementSibling.textContent.trim();
             }).join(', ') || 'Aucun sélectionné';
 
-            // Mettre à jour l'aperçu
+            // Mise à jour de l'aperçu
             document.getElementById('review-fullname').textContent = `${firstName} ${lastName}`;
             document.getElementById('review-email').textContent = email;
-            document.getElementById('review-birthdate').textContent = birthDate;
+            document.getElementById('review-birthdate').textContent = `${birthDate} (${pedagogicLevelText})`;
             document.getElementById('review-interests').textContent = interestsLabels;
         }
 
-        // Dans votre script existant, ajoutez ce code :
+        function handleProfilePictureUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validation du fichier
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Le fichier est trop volumineux (max 2MB)');
+                    return;
+                }
 
-// Gestion de l'upload de photo de profil
-const profilePicInput = document.getElementById('id_profile_picture');
-const avatarPreview = document.getElementById('avatarPreview');
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Seuls les formats JPG, PNG et GIF sont acceptés');
+                    return;
+                }
 
-profilePicInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        // Vérification de la taille du fichier (max 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Le fichier est trop volumineux (max 2MB)');
-            return;
+                // Affichage de l'aperçu
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    avatarPreview.innerHTML = `<img src="${event.target.result}" class="w-full h-full object-cover" alt="Preview">`;
+                    avatarPreview.classList.remove('border-dashed');
+                    avatarPreview.classList.add('border-solid', 'border-blue-500');
+                }
+                reader.readAsDataURL(file);
+            }
         }
 
-        // Vérification du type de fichier
-        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!validTypes.includes(file.type)) {
-            alert('Seuls les formats JPG, PNG et GIF sont acceptés');
-            return;
-        }
+        function handleFormSubmission(e) {
+            e.preventDefault();
+            
+            // Validation finale
+            if (!document.getElementById('terms').checked) {
+                alert('Veuillez accepter les conditions d\'utilisation');
+                return;
+            }
 
-        // Affichage de l'aperçu
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            avatarPreview.innerHTML = `<img src="${event.target.result}" class="w-full h-full object-cover" alt="Preview">`;
+            // Soumission du formulaire
+            form.submit();
         }
-        reader.readAsDataURL(file);
-    }
-});
     });
 </script>
+
+
 {% endblock %}

@@ -28,6 +28,16 @@ class CustomUserCreationForm(UserCreationForm):
         required=False,
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Rendre certains champs non obligatoires pour le processus multi-étapes
+        self.fields['first_name'].required = False
+        self.fields['last_name'].required = False
+        self.fields['gender'].required = False
+        self.fields['birth_date'].required = False
+        self.fields['pedagogic_level'].required = False
+        self.fields['interests'].required = False
+
     class Meta(UserCreationForm.Meta):
         model = CustomUser
         fields = ('username', 'email', 'password1', 'password2',
