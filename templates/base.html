@@ -3,15 +3,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EHBLO</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .mobile-nav-item {
+            padding: 12px 0;
+            min-width: 60px;
+        }
+        main {
+            margin-bottom: 80px;
+        }
+        .profile-dropdown {
+            display: none;
+        }
+        .profile-dropdown.show {
+            display: block;
+        }
+    </style>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100">
     <!-- Desktop Navbar -->
     <nav class="hidden md:flex bg-white shadow-md p-4 justify-between items-center">
-        <div style="display : flex;" class="text-2xl font-bold text-purple-600"><img style="margin : 0 30px 0 0 ; height: 30px; width : 30px;" src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-8 w-8 object-contain">
-       EHBLO</div>
+        <div style="display: flex;" class="text-2xl font-bold text-purple-600">
+            <img style="margin: 0 30px 0 0; height: 30px; width: 30px;" src="{% static 'images/logo.png' %}" alt="EHBLO Logo" class="h-8 w-8 object-contain">
+            EHBLO
+        </div>
         <div class="flex space-x-6 items-center">
             <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600">Courses</a>
             {% if user.is_authenticated %}
@@ -45,42 +62,63 @@
     </nav>
 
     <!-- Mobile Navbar (Fixed Bottom) -->
-    <nav style ="z-index:1000;" class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md p-4 flex justify-around items-center border-t">
-        <a href="{% url 'my_courses' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"></path></svg>
-            <span class="text-sm">Courses</span>
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md p-2 flex justify-around items-center border-t" style="z-index: 1000;">
+        <a href="{% url 'home' %}" class="mobile-nav-item flex flex-col items-center text-gray-700 hover:text-blue-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"></path>
+            </svg>
+            <span class="text-xs mt-1">Courses</span>
         </a>
         {% if user.is_authenticated %}
-            <a href="{% url 'my_courses' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span class="text-sm">My Courses</span>
+            <a href="{% url 'my_courses' %}" class="mobile-nav-item flex flex-col items-center text-gray-700 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span class="text-xs mt-1">My Courses</span>
             </a>
-            <a href="{% url 'my_chats' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                <span class="text-sm">Chats</span>
+            <a href="{% url 'my_chats' %}" class="mobile-nav-item flex flex-col items-center text-gray-700 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                <span class="text-xs mt-1">Chats</span>
             </a>
             {% if user.user_type == 'instructor' %}
-                <a href="{% url 'instructor_dashboard' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    <span class="text-sm">Instructor</span>
+                <a href="{% url 'instructor_dashboard' %}" class="mobile-nav-item flex flex-col items-center text-gray-700 hover:text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Instructor</span>
                 </a>
             {% endif %}
-            <div class="flex flex-col items-center text-gray-700 hover:text-blue-600">
-                {% if user.profile_picture %}
-                    <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full">
-                {% else %}
-                    <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs">U</div>
-                {% endif %}
-                <span class="text-sm">Profile</span>
+            <div class="mobile-nav-item flex flex-col items-center relative">
+                <div id="mobile-profile-toggle" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full">
+                    {% else %}
+                        <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs">U</div>
+                    {% endif %}
+                    <span class="text-xs mt-1">Profile</span>
+                </div>
+                <div id="mobile-profile-dropdown" class="profile-dropdown absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white shadow-md rounded-md p-2 w-32">
+                    <a href="{% url 'profile' %}" class="block text-gray-700 hover:text-blue-600 py-1 text-center">Profile</a>
+                    <form action="{% url 'logout' %}" method="post" class="mt-1">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full text-red-600 hover:text-red-800 py-1 text-center">Logout</button>
+                    </form>
+                </div>
             </div>
         {% else %}
-            <a href="{% url 'login' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14"></path></svg>
-                <span class="text-sm">Login</span>
+            <a href="{% url 'login' %}" class="mobile-nav-item flex flex-col items-center text-gray-700 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14"></path>
+                </svg>
+                <span class="text-xs mt-1">Login</span>
             </a>
-            <a href="{% url 'signup' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                <span class="text-sm">Sign Up</span>
+            <a href="{% url 'signup' %}" class="mobile-nav-item flex flex-col items-center text-gray-700 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <span class="text-xs mt-1">Sign Up</span>
             </a>
         {% endif %}
     </nav>
@@ -92,7 +130,9 @@
                 <div class="p-4 rounded-md mb-4 flex items-center justify-between {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
                     <div>{{ message }}</div>
                     <button class="text-gray-500 hover:text-gray-700" onclick="this.parentElement.remove()">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
                     </button>
                 </div>
             {% endfor %}
@@ -116,20 +156,18 @@
                 <h3 class="text-lg font-bold mb-4">Quick Links</h3>
                 <ul class="space-y-2">
                     <li><a href="{% url 'my_courses' %}" class="hover:text-blue-400">Courses</a></li>
-
-
                 </ul>
             </div>
             <div>
                 <h3 class="text-lg font-bold mb-4">Support</h3>
                 <ul class="space-y-2">
-
+                    <!-- Add support links here -->
                 </ul>
             </div>
             <div>
                 <h3 class="text-lg font-bold mb-4">Legal</h3>
                 <ul class="space-y-2">
-
+                    <!-- Add legal links here -->
                 </ul>
             </div>
         </div>
@@ -137,5 +175,32 @@
             <p>© {% now "Y" %} EHBLO. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        // Gestion du menu profile mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileToggle = document.getElementById('mobile-profile-toggle');
+            const profileDropdown = document.getElementById('mobile-profile-dropdown');
+            
+            if (profileToggle && profileDropdown) {
+                profileToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('show');
+                });
+                
+                // Fermer le dropdown quand on clique ailleurs
+                document.addEventListener('click', function() {
+                    profileDropdown.classList.remove('show');
+                });
+            }
+            
+            // Empêcher la propagation pour le dropdown lui-même
+            if (profileDropdown) {
+                profileDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
 </body>
 </html>

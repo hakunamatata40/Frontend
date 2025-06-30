@@ -1,56 +1,683 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}EHBLO{% endblock %}
+{% block title %}EHBLO Education{% endblock %}
 
 {% block content %}
-{# Changed bg-blue-50 to bg-purple-50 #}
-<div class="text-center py-20 bg-purple-50 rounded-lg shadow-md">
-    {# Changed text-blue-800 to text-purple-800 #}
-    <h1 class="text-5xl font-extrabold text-purple-800 mb-4 animate-fade-in-down">
-        Learn Anything, Anywhere, Anytime
-    </h1>
-    <p class="text-xl text-gray-700 mb-8 animate-fade-in-up">
-        Your journey to knowledge starts here. Explore our diverse range of courses.
-    </p>
-    <div class="flex flex-col sm:flex-row justify-center gap-4">
-        {# Changed bg-blue-600 to bg-purple-600 and hover:bg-blue-700 to hover:bg-purple-700 #}
-        <a href="{% url 'course_list' %}"
-           class="bg-purple-600 text-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-purple-700 transition duration-300 transform hover:scale-105 animate-bounce-in">
-            Browse All Courses
-        </a>
-        {# Keeping green buttons as a contrasting accent #}
-        {% if not user.is_authenticated %}
-            <a href="{% url 'signup' %}"
-               class="bg-green-600 text-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-105 animate-bounce-in">
-                Become an Instructor
-            </a>
-        {% elif user.user_type == 'instructor' %}
-            <a href="{% url 'instructor_dashboard' %}"
-               class="bg-green-600 text-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-105 animate-bounce-in">
-                Go to Instructor Dashboard
-            </a>
-        {% endif %}
-    </div>
-</div>
+<style>
+    /* Styles spécifiques à la page d'accueil */
+    .hero-background {
+        background-image: url('{% static "back.png" %}');
+        background-size: cover;
+        background-position: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 50%;
+        height: 100vh;
+        z-index: 0;
+    }
 
-{# You can add sections for featured courses, testimonials, etc., here #}
-{% comment %}
-<section class="mt-20">
-    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">Featured Courses</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {% for course in featured_courses %}
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ course.title }}</h3>
-                    <p class="text-gray-600">{{ course.overview|truncatechars:100 }}</p>
-                    <a href="{% url 'course_detail' course.id course.slug %}" class="block mt-4 text-purple-600 hover:underline">Learn More &rarr;</a>
-                </div>
+    .hero {
+        padding: 100px 20px;
+        position: relative;
+        z-index: 10;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: linear-gradient(to right, #4B0082, #E6E6FA);
+    }
+
+    .hero-content {
+        margin: 100px 0 0 20px;
+        max-width: 100%;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .tete {
+        width: 45%;
+    }
+
+    .hero h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: #fff;
+    }
+
+    .hero p {
+        font-size: 18px;
+        margin-bottom: 30px;
+        color: #fff;
+    }
+
+    .btn-container {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        color: white;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-weight: 500;
+        max-width: 250px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .btn-blue { background-color: #1E90FF; }
+    .btn-blue:hover { background-color: #104E8B; transform: translateY(-2px); }
+    .btn-purple { background-color: #8A2BE2; }
+    .btn-purple:hover { background-color: #4B0082; transform: translateY(-2px); }
+
+    .carousel-section {
+        padding: 60px 20px;
+        background: #E6E6FA;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .carousel {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .carousel-track {
+        display: flex;
+        width: fit-content;
+        animation: scrollCarousel 20s linear infinite;
+    }
+
+    @keyframes scrollCarousel {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    .item {
+        flex: 0 0 auto;
+        width: 250px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        padding: 15px;
+        margin: 0 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        z-index: 2;
+    }
+
+    .item img {
+        width: 100%;
+        border-radius: 10px;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .item h3 {
+        margin: 10px 0 5px;
+        color: #6A0DAD;
+    }
+
+    .services {
+        text-align: center;
+        padding: 40px 20px;
+        background: #E6E6FA;
+    }
+
+    .slider-container {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .slider {
+        display: flex;
+        width: fit-content;
+        animation: scrollSlider 20s linear infinite;
+    }
+
+    @keyframes scrollSlider {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    .slider-item {
+        flex: 0 0 auto;
+        width: 350px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        padding: 15px;
+        margin: 0 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .slider-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        z-index: 2;
+    }
+
+    .review-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .review-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+
+    .review-name {
+        font-weight: 600;
+        color: #6A0DAD;
+        flex-grow: 1;
+        text-align: right;
+    }
+
+    .review-content {
+        color: #555;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .review-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        color: #777;
+    }
+
+    .review-subject {
+        background-color: #E6E6FA;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .review-date {
+        font-style: italic;
+    }
+
+    .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #4B0082;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+    }
+
+    .nav-btn:hover {
+        opacity: 1;
+    }
+
+    .prev {
+        left: 10px;
+    }
+
+    .next-2 {
+        right: 10px;
+    }
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+        .hero-content {
+            flex-direction: column;
+            margin: 80px 0 0 0;
+            text-align: center;
+        }
+
+        .tete {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .hero h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .btn-container {
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .hero-background {
+            width: 100%;
+            opacity: 0.3;
+        }
+
+        .item {
+            width: 200px;
+        }
+
+        .item img {
+            height: 140px;
+        }
+
+        .slider-item {
+            width: 280px;
+            margin: 0 10px;
+        }
+
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+        }
+
+        .review-name {
+            font-size: 14px;
+        }
+
+        .review-content {
+            font-size: 13px;
+        }
+
+        .nav-btn {
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero {
+            padding: 80px 15px;
+        }
+
+        .hero h1 {
+            font-size: 24px;
+        }
+
+        .hero p {
+            font-size: 14px;
+        }
+
+        .item {
+            width: 160px;
+            padding: 10px;
+        }
+
+        .item img {
+            height: 120px;
+        }
+
+        .item h3 {
+            font-size: 16px;
+        }
+
+        .slider-item {
+            width: 240px;
+            padding: 10px;
+        }
+
+        .review-header {
+            margin-bottom: 10px;
+        }
+
+        .review-avatar {
+            width: 35px;
+            height: 35px;
+            margin-right: 10px;
+        }
+    }
+</style>
+
+<div class="hero-background"></div>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="tete">
+            <h1>Plongez dans l'Apprentissage</h1>
+            <p>Découvrez une vaste gamme de livres, des professeurs experts et une IA contextuelle innovante.</p>
+            <div class="btn-container">
+                <a href="{% url 'course_list' %}" class="btn btn-blue">Explorer les Cours</a>
+                <a href="{% url 'signup' %}" class="btn btn-purple">S'inscrire</a>
             </div>
-        {% empty %}
-            <p class="col-span-3 text-center text-gray-600">No featured courses yet.</p>
-        {% endfor %}
+        </div>
+        <img src="{% static 'back.png' %}" alt="Illustration éducation" class="hero-image">
     </div>
 </section>
-{% endcomment %}
+
+<section class="carousel-section" id="courses">
+    <h2 style="font-weight: bold; font-size: 20px;">Nos Livres Populaires</h2>
+    <div class="carousel">
+        <div class="carousel-track" style="padding:20px 0">
+            <div class="item">
+                <img src="{% static 'book1.jpeg' %}" alt="Livre 1">
+                <h3>Manuel de Physique-Chimie</h3>
+                <p>Couvre les principes fondamentaux de la physique et de la chimie pour lycéens, avec exercices pratiques.</p>
+            </div>
+            <div class="item">
+                <img src="{% static 'book3.jpeg' %}" alt="Livre 3">
+                <h3>Histoire du Monde Contemporain</h3>
+                <p>Panorama des événements historiques majeurs du 20ème siècle à nos jours, avec analyses critiques.</p>
+            </div>
+            <div class="item">
+                <img src="{% static 'book2.jpeg' %}" alt="Livre 2">
+                <h3>Biologie Cellulaire Avancée</h3>
+                <p>Approfondissement des mécanismes cellulaires et moléculaires, idéal pour étudiants en médecine.</p>
+            </div>
+            <div class="item">
+                <img src="{% static 'book4.jpeg' %}" alt="Livre 1">
+                <h3>Géologie Appliquée</h3>
+                <p>Étude des structures terrestres et des processus géologiques, avec études de cas régionaux.</p>
+            </div>
+            <div class="item">
+                <img src="{% static 'book5.jpeg' %}" alt="Livre 3">
+                <h3>Histoire des Civilisations Antiques</h3>
+                <p>Exploration détaillée des civilisations égyptienne, mésopotamienne et gréco-romaine.</p>
+            </div>
+            <div class="item">
+                <img src="{% static 'book6.jpeg' %}" alt="Livre 2">
+                <h3>Programmation Python</h3>
+                <p>Guide complet pour maîtriser Python, des bases aux concepts avancés comme le machine learning.</p>
+            </div>
+            <div class="item">
+                <img src="{% static 'book7.jpeg' %}" alt="Livre 3">
+                <h3>Histoire de l'Art Moderne</h3>
+                <p>Parcours à travers les mouvements artistiques majeurs de la période moderne et leurs influences.</p>
+            </div>
+            <div class="item">
+                <img src="{% static 'book2.jpeg' %}" alt="Livre 2">
+                <h3>Développement Web Fullstack</h3>
+                <p>Méthodologie complète pour créer des applications web modernes avec les dernières technologies.</p>
+            </div>
+            <div class="item">
+                <img src="{% static 'book3.jpeg' %}" alt="Livre 3">
+                <h3>Histoire Économique Globale</h3>
+                <p>Analyse des systèmes économiques à travers les âges et leur impact sur le développement des sociétés.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="services" id="services">
+    <h2 class="text-2xl md:text-3xl font-bold text-purple-800 mb-3">Témoignages de nos utilisateurs</h2>
+    <div class="slider-container">
+        <div class="slider">
+            <!-- Avis 1 -->
+            <div class="slider-item">
+                <div class="review-header">
+                    <img src="{% static 'book1.jpeg' %}" alt="Jean Amougou" class="review-avatar">
+                    <span class="review-name">Jean Amougou</span>
+                </div>
+                <div class="review-content">
+                    "L'application EHBLO Education a révolutionné ma façon d'apprendre. Les livres proposés sont de grande qualité et les professeurs sont vraiment compétents. Je recommande vivement !"
+                </div>
+                <div class="review-footer">
+                    <span class="review-subject">Mathématiques</span>
+                    <span class="review-date">15/03/2023</span>
+                </div>
+            </div>
+
+            <!-- Avis 2 -->
+            <div class="slider-item">
+                <div class="review-header">
+                    <img src="{% static 'prof.jpeg' %}" alt="Julie Roosevelt" class="review-avatar">
+                    <span class="review-name">Julie Roosevelt</span>
+                </div>
+                <div class="review-content">
+                    "En tant que professeure de physique, j'apprécie particulièrement la qualité des ressources pédagogiques disponibles. L'interface est intuitive et mes élèves progressent rapidement."
+                </div>
+                <div class="review-footer">
+                    <span class="review-subject">Physique</span>
+                    <span class="review-date">22/04/2023</span>
+                </div>
+            </div>
+
+            <!-- Avis 3 -->
+            <div class="slider-item">
+                <div class="review-header">
+                    <img src="{% static 'fonf.jpeg' %}" alt="Mbarga Martin" class="review-avatar">
+                    <span class="review-name">Mbarga Martin</span>
+                </div>
+                <div class="review-content">
+                    "Le chat IA est incroyablement utile pour répondre à mes questions en temps réel. J'ai pu améliorer mes notes en histoire grâce aux explications claires et détaillées."
+                </div>
+                <div class="review-footer">
+                    <span class="review-subject">Histoire</span>
+                    <span class="review-date">05/05/2023</span>
+                </div>
+            </div>
+
+            <!-- Avis 4 -->
+            <div class="slider-item">
+                <div class="review-header">
+                    <img src="{% static 'book8.jpeg' %}" alt="Uriel Onguene" class="review-avatar">
+                    <span class="review-name">Uriel Onguene</span>
+                </div>
+                <div class="review-content">
+                    "Les cours sont bien structurés et adaptés à différents niveaux. J'ai particulièrement apprécié les exercices interactifs qui rendent l'apprentissage plus engageant."
+                </div>
+                <div class="review-footer">
+                    <span class="review-subject">Programmation</span>
+                    <span class="review-date">18/06/2023</span>
+                </div>
+            </div>
+
+            <!-- Duplication pour l'effet de défilement infini -->
+            <!-- Avis 1 -->
+            <div class="slider-item">
+                <div class="review-header">
+                    <img src="{% static 'book1.jpeg' %}" alt="Jean Amougou" class="review-avatar">
+                    <span class="review-name">Jean Amougou</span>
+                </div>
+                <div class="review-content">
+                    "L'application EHBLO Education a révolutionné ma façon d'apprendre. Les livres proposés sont de grande qualité et les professeurs sont vraiment compétents. Je recommande vivement !"
+                </div>
+                <div class="review-footer">
+                    <span class="review-subject">Mathématiques</span>
+                    <span class="review-date">15/03/2023</span>
+                </div>
+            </div>
+
+            <!-- Avis 2 -->
+            <div class="slider-item">
+                <div class="review-header">
+                    <img src="{% static 'prof.jpeg' %}" alt="Julie Roosevelt" class="review-avatar">
+                    <span class="review-name">Julie Roosevelt</span>
+                </div>
+                <div class="review-content">
+                    "En tant que professeure de physique, j'apprécie particulièrement la qualité des ressources pédagogiques disponibles. L'interface est intuitive et mes élèves progressent rapidement."
+                </div>
+                <div class="review-footer">
+                    <span class="review-subject">Physique</span>
+                    <span class="review-date">22/04/2023</span>
+                </div>
+            </div>
+
+            <!-- Avis 3 -->
+            <div class="slider-item">
+                <div class="review-header">
+                    <img src="{% static 'fonf.jpeg' %}" alt="Mbarga Martin" class="review-avatar">
+                    <span class="review-name">Mbarga Martin</span>
+                </div>
+                <div class="review-content">
+                    "Le chat IA est incroyablement utile pour répondre à mes questions en temps réel. J'ai pu améliorer mes notes en histoire grâce aux explications claires et détaillées."
+                </div>
+                <div class="review-footer">
+                    <span class="review-subject">Histoire</span>
+                    <span class="review-date">05/05/2023</span>
+                </div>
+            </div>
+
+            <!-- Avis 4 -->
+            <div class="slider-item">
+                <div class="review-header">
+                    <img src="{% static 'book8.jpeg' %}" alt="Uriel Onguene" class="review-avatar">
+                    <span class="review-name">Uriel Onguene</span>
+                </div>
+                <div class="review-content">
+                    "Les cours sont bien structurés et adaptés à différents niveaux. J'ai particulièrement apprécié les exercices interactifs qui rendent l'apprentissage plus engageant."
+                </div>
+                <div class="review-footer">
+                    <span class="review-subject">Programmation</span>
+                    <span class="review-date">18/06/2023</span>
+                </div>
+            </div>
+        </div>
+        <button class="nav-btn prev">❮</button>
+        <button class="nav-btn next-2">❯</button>
+    </div>
+</section>
+
+<script>
+    // Slider functionality
+    const slider = document.querySelector('.slider');
+    const prevBtn = document.querySelector('.prev');
+    const nextBtn = document.querySelector('.next-2');
+    const sliderItems = document.querySelectorAll('.slider-item');
+    let currentIndex = 0;
+    let isPaused = false;
+    const itemWidth = 350; // Largeur d'un élément slider-item + margin
+    const visibleItems = 3; // Nombre d'éléments visibles à la fois
+
+    // Fonction pour déplacer le slider
+    function moveSlider(direction) {
+        // Calculer le nombre total d'éléments uniques (en ignorant les duplications)
+        const totalUniqueItems = sliderItems.length / 2;
+
+        if (direction === 'next') {
+            currentIndex = (currentIndex + 1) % totalUniqueItems;
+        } else {
+            currentIndex = (currentIndex - 1 + totalUniqueItems) % totalUniqueItems;
+        }
+
+        // Calculer la position de décalage
+        const offset = -currentIndex * itemWidth;
+
+        // Appliquer la transformation avec une animation fluide
+        slider.style.transition = 'transform 0.5s ease-in-out';
+        slider.style.transform = `translateX(${offset}px)`;
+
+        // Réinitialiser l'animation automatique
+        resetAutoAnimation();
+    }
+
+    // Réinitialiser l'animation automatique après une navigation manuelle
+    function resetAutoAnimation() {
+        // Arrêter l'animation CSS
+        slider.style.animation = 'none';
+
+        // Redémarrer après un court délai
+        setTimeout(() => {
+            slider.style.animation = 'scrollSlider 20s linear infinite';
+            isPaused = false;
+        }, 500);
+    }
+
+    // Gestion des événements
+    prevBtn.addEventListener('click', () => {
+        moveSlider('prev');
+        isPaused = true;
+    });
+
+    nextBtn.addEventListener('click', () => {
+        moveSlider('next');
+        isPaused = true;
+    });
+
+    // Pause au survol
+    slider.addEventListener('mouseenter', () => {
+        slider.style.animationPlayState = 'paused';
+        isPaused = true;
+    });
+
+    slider.addEventListener('mouseleave', () => {
+        if (!isPaused) {
+            slider.style.animationPlayState = 'running';
+        }
+    });
+
+    // Réinitialiser l'animation quand on clique ailleurs
+    document.addEventListener('click', (e) => {
+        if (!slider.contains(e.target) && !prevBtn.contains(e.target) && !nextBtn.contains(e.target)) {
+            slider.style.animationPlayState = 'running';
+            isPaused = false;
+        }
+    });
+
+    // Au chargement de la page, positionner correctement le slider
+    window.addEventListener('load', () => {
+        slider.style.transform = 'translateX(0)';
+    });
+
+    // Adaptation pour mobile - ajuster la largeur des éléments en fonction de l'écran
+    function adjustSliderItems() {
+        const screenWidth = window.innerWidth;
+        const sliderItems = document.querySelectorAll('.slider-item');
+        let newWidth = 350; // Valeur par défaut
+
+        if (screenWidth <= 768) {
+            newWidth = 280;
+        }
+        if (screenWidth <= 480) {
+            newWidth = 240;
+        }
+
+        sliderItems.forEach(item => {
+            item.style.width = `${newWidth}px`;
+        });
+    }
+
+    // Exécuter au chargement et lors du redimensionnement
+    window.addEventListener('load', adjustSliderItems);
+    window.addEventListener('resize', adjustSliderItems);
+</script>
 {% endblock %}

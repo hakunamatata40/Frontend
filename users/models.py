@@ -10,9 +10,10 @@ class CustomUser(AbstractUser):
     )
 
     PEDAGOGIC_LEVEL_CHOICES = (
-        ('beginner', 'Beginner'),
-        ('intermediate', 'Intermediate'),
-        ('advanced', 'Advanced'),
+        ('primaire', 'Prinmaire'),
+        ('secondaire', 'Secondaire'),
+        ('universitaire', 'Universitaire'),
+        ('personnel', 'Personnel'),
     )
 
     GENDER_CHOICES = (
