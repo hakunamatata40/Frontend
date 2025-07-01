@@ -4,51 +4,50 @@
 {% block title %}All Courses{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+<div class="page-container">
     <!-- Search Bar at the Top -->
-    <div class="max-w-7xl mx-auto mb-8 animate-fade-in">
-        <form action="{% url 'course_list' %}" method="get" class="bg-white rounded-full shadow-xl p-1 flex items-center">
-            <div class="relative flex-grow">
+    <div class="search-container">
+        <form action="{% url 'course_list' %}" method="get" class="search-form">
+            <div class="search-input-container">
                 <input type="search" name="q" placeholder="What do you want to learn today?" value="{{ query }}"
-                       class="w-full p-4 pl-14 border-0 rounded-full focus:ring-2 focus:ring-blue-500 focus:outline-none text-lg placeholder-gray-400">
-                <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       class="search-input">
+                <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </div>
-            <button type="submit"
-                    class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-full font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg ml-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <button type="submit" class="search-button">
                 Search
             </button>
         </form>
     </div>
 
     <!-- Subjects Carousel -->
-    <div class="max-w-7xl mx-auto mb-8 animate-fade-in">
+    <div class="subjects-container">
         <div class="swiper subjects-swiper">
             <div class="swiper-wrapper">
-                <div class="swiper-slide w-auto">
+                <div class="swiper-slide subject-slide">
                     <a href="{% url 'course_list' %}"
-                       class="subject-card group {% if not current_subject_slug %}active-subject{% endif %}">
-                        <div class="p-2 flex flex-col items-center justify-center w-20 h-20">
-                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center transition-all duration-300 group-hover:bg-blue-200">
-                                <svg class="w-6 h-6 text-blue-600 transition-all duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="subject-card {% if not current_subject_slug %}active-subject{% endif %}">
+                        <div class="subject-card-content">
+                            <div class="subject-icon">
+                                <svg class="subject-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                 </svg>
                             </div>
-                            <span class="text-sm mt-1 text-gray-700 truncate w-full text-center font-medium">All</span>
+                            <span class="subject-name">All</span>
                         </div>
                     </a>
                 </div>
 
                 {% for subject in subjects %}
-                <div class="swiper-slide w-auto">
+                <div class="swiper-slide subject-slide">
                     <a href="{% url 'course_list_by_subject' subject.slug %}"
-                       class="subject-card group {% if current_subject_slug == subject.slug %}active-subject{% endif %}">
-                        <div class="p-2 flex flex-col items-center justify-center w-20 h-20">
-                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center transition-all duration-300 group-hover:bg-blue-200">
-                                <span class="text-lg font-bold text-blue-600 transition-all duration-300 group-hover:scale-110">{{ subject.name|first }}</span>
+                       class="subject-card {% if current_subject_slug == subject.slug %}active-subject{% endif %}">
+                        <div class="subject-card-content">
+                            <div class="subject-icon">
+                                <span class="subject-initial">{{ subject.name|first }}</span>
                             </div>
-                            <span class="text-sm mt-1 text-gray-700 truncate w-full text-center font-medium">{{ subject.name|truncatechars:12 }}</span>
+                            <span class="subject-name">{{ subject.name|truncatechars:12 }}</span>
                         </div>
                     </a>
                 </div>
@@ -58,19 +57,19 @@
     </div>
 
     <!-- Hero Slider -->
-    <div class="max-w-7xl mx-auto mb-16 rounded-2xl overflow-hidden shadow-xl animate-fade-in">
+    <div class="hero-container">
         <div class="swiper hero-swiper">
             <div class="swiper-wrapper">
                 <!-- Slide 1 -->
-                <div class="swiper-slide relative">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-800 opacity-70"></div>
+                <div class="swiper-slide hero-slide">
+                    <div class="hero-overlay blue-overlay"></div>
                     <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                         class="w-full h-full object-cover" alt="Students learning" loading="lazy">
-                    <div class="absolute inset-0 flex items-center justify-center text-center px-8">
-                        <div class="text-white max-w-2xl">
-                            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Start Your Learning Journey Today</h2>
-                            <p class="text-lg sm:text-xl mb-6">Join thousands of students mastering new skills with our expert instructors</p>
-                            <a href="#" class="inline-block bg-white text-blue-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
+                         class="hero-image" alt="Students learning" loading="lazy">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h2 class="hero-title">Start Your Learning Journey Today</h2>
+                            <p class="hero-description">Join thousands of students mastering new skills with our expert instructors</p>
+                            <a href="#" class="hero-button white-button">
                                 Explore Courses
                             </a>
                         </div>
@@ -78,15 +77,15 @@
                 </div>
 
                 <!-- Slide 2 -->
-                <div class="swiper-slide relative">
-                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-70"></div>
+                <div class="swiper-slide hero-slide">
+                    <div class="hero-overlay purple-overlay"></div>
                     <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                         class="w-full h-full object-cover" alt="Online education" loading="lazy">
-                    <div class="absolute inset-0 flex items-center justify-center text-center px-8">
-                        <div class="text-white max-w-2xl">
-                            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Learn From Anywhere</h2>
-                            <p class="text-lg sm:text-xl mb-6">Access high-quality courses anytime, anywhere at your own pace</p>
-                            <a href="#" class="inline-block bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
+                         class="hero-image" alt="Online education" loading="lazy">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h2 class="hero-title">Learn From Anywhere</h2>
+                            <p class="hero-description">Access high-quality courses anytime, anywhere at your own pace</p>
+                            <a href="#" class="hero-button white-button">
                                 Get Started
                             </a>
                         </div>
@@ -94,15 +93,15 @@
                 </div>
 
                 <!-- Slide 3 -->
-                <div class="swiper-slide relative">
-                    <div class="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 opacity-70"></div>
+                <div class="swiper-slide hero-slide">
+                    <div class="hero-overlay green-overlay"></div>
                     <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                         class="w-full h-full object-cover" alt="Coding class" loading="lazy">
-                    <div class="absolute inset-0 flex items-center justify-center text-center px-8">
-                        <div class="text-white max-w-2xl">
-                            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Advance Your Career</h2>
-                            <p class="text-lg sm:text-xl mb-6">Gain in-demand skills that employers are looking for</p>
-                            <a href="#" class="inline-block bg-white text-green-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
+                         class="hero-image" alt="Coding class" loading="lazy">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h2 class="hero-title">Advance Your Career</h2>
+                            <p class="hero-description">Gain in-demand skills that employers are looking for</p>
+                            <a href="#" class="hero-button white-button">
                                 Browse Programs
                             </a>
                         </div>
@@ -110,72 +109,70 @@
                 </div>
             </div>
             <div class="swiper-pagination"></div>
-            <div class="swiper-button-next !text-white"></div>
-            <div class="swiper-button-prev !text-white"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
     </div>
 
     <!-- All Courses Section -->
-    <div class="max-w-7xl mx-auto mb-16">
-        <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-8 text-center">Our Featured Courses</h2>
+    <div class="courses-container">
+        <h2 class="courses-title">Our Featured Courses</h2>
 
         {% if courses %}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="courses-grid">
                 {% for course in courses %}
-                    <a href="{% url 'course_detail' course.id course.slug %}" class="course-card group">
-                        <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col">
+                    <a href="{% url 'course_detail' course.id course.slug %}" class="course-card">
+                        <div class="course-card-inner">
                             <!-- Course Image -->
-                            <div class="relative overflow-hidden h-48 flex-shrink-0">
+                            <div class="course-image-container">
                                 {% if course.image %}
                                     <img src="{{ course.image.url }}" alt="{{ course.title }}"
-                                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+                                         class="course-image" loading="lazy">
                                 {% else %}
-                                    <div class="w-full h-full bg-gradient-to-r from-blue-100 to-indigo-200 flex items-center justify-center">
-                                        <svg class="w-16 h-16 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="course-image-placeholder">
+                                        <svg class="placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                         </svg>
                                     </div>
                                 {% endif %}
-                                <div class="absolute top-4 right-4">
-                                    <span class="bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full shadow-md transition-all duration-300 group-hover:bg-blue-600 group-hover:text-white">
-                                        {{ course.subject.name }}
-                                    </span>
+                                <div class="course-subject-tag">
+                                    {{ course.subject.name }}
                                 </div>
                             </div>
 
                             <!-- Course Content -->
-                            <div class="p-6 flex-grow">
-                                <div class="flex items-center mb-3">
-                                    <div class="flex items-center">
-                                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <div class="course-content">
+                                <div class="course-meta">
+                                    <div class="course-rating">
+                                        <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                         </svg>
-                                        <span class="text-gray-700 ml-1 text-sm">4.8 (120)</span>
+                                        <span class="rating-text">4.8 (120)</span>
                                     </div>
-                                    <span class="mx-2 text-gray-300">•</span>
-                                    <span class="text-gray-500 text-sm">{{ course.num_modules }} modules</span>
+                                    <span class="meta-separator">•</span>
+                                    <span class="course-modules">{{ course.num_modules }} modules</span>
                                 </div>
 
-                                <h2 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                                <h2 class="course-title">
                                     {{ course.title }}
                                 </h2>
-                                <p class="text-gray-600 mb-4 line-clamp-2">{{ course.overview }}</p>
+                                <p class="course-description">{{ course.overview }}</p>
 
-                                <div class="flex items-center mt-auto">
-                                    <div class="flex-shrink-0">
-                                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold transition-all duration-300 group-hover:bg-blue-200">
+                                <div class="course-footer">
+                                    <div class="instructor-info">
+                                        <div class="instructor-avatar">
                                             {{ course.instructor.get_full_name|default:course.instructor.username|first }}
                                         </div>
+                                        <div class="instructor-details">
+                                            <p class="instructor-label">Instructor</p>
+                                            <p class="instructor-name">{{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                                        </div>
                                     </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">Instructor</p>
-                                        <p class="text-sm text-gray-500">{{ course.instructor.get_full_name|default:course.instructor.username }}</p>
-                                    </div>
-                                    <div class="ml-auto text-lg font-bold text-blue-600">
+                                    <div class="course-price">
                                         {% if course.price > 0 %}
                                             FCFA{{ course.price }}
                                         {% else %}
-                                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Free</span>
+                                            <span class="free-badge">Free</span>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -187,13 +184,13 @@
 
             <!-- Pagination -->
             {% if is_paginated %}
-                <nav class="flex justify-center mt-12 animate-fade-in">
-                    <ul class="inline-flex space-x-2">
+                <nav class="pagination-container">
+                    <ul class="pagination-list">
                         {% if page_obj.has_previous %}
-                            <li>
+                            <li class="pagination-item">
                                 <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_subject_slug %}&subject={{ current_subject_slug }}{% endif %}"
-                                   class="flex items-center justify-center w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:bg-blue-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   class="pagination-link pagination-arrow">
+                                    <svg class="arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                                     </svg>
                                 </a>
@@ -202,15 +199,15 @@
 
                         {% for i in paginator.page_range %}
                             {% if page_obj.number == i %}
-                                <li>
-                                    <span class="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md">
+                                <li class="pagination-item">
+                                    <span class="pagination-link pagination-active">
                                         {{ i }}
                                     </span>
                                 </li>
                             {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
-                                <li>
+                                <li class="pagination-item">
                                     <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if current_subject_slug %}&subject={{ current_subject_slug }}{% endif %}"
-                                       class="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-700 shadow-md hover:bg-blue-50 hover:text-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="pagination-link">
                                         {{ i }}
                                     </a>
                                 </li>
@@ -218,10 +215,10 @@
                         {% endfor %}
 
                         {% if page_obj.has_next %}
-                            <li>
+                            <li class="pagination-item">
                                 <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_subject_slug %}&subject={{ current_subject_slug }}{% endif %}"
-                                   class="flex items-center justify-center w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:bg-blue-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   class="pagination-link pagination-arrow">
+                                    <svg class="arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                     </svg>
                                 </a>
@@ -232,15 +229,15 @@
             {% endif %}
 
         {% else %}
-            <div class="text-center py-16 animate-fade-in">
-                <div class="mx-auto w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="no-courses">
+                <div class="no-courses-icon">
+                    <svg class="no-courses-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">No courses found</h3>
-                <p class="text-gray-600 max-w-md mx-auto">We couldn't find any courses matching your criteria. Try adjusting your search filters.</p>
-                <a href="{% url 'course_list' %}" class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <h3 class="no-courses-title">No courses found</h3>
+                <p class="no-courses-message">We couldn't find any courses matching your criteria. Try adjusting your search filters.</p>
+                <a href="{% url 'course_list' %}" class="no-courses-button">
                     Reset Filters
                 </a>
             </div>
@@ -253,6 +250,63 @@
 <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
 
 <style>
+    /* Base Styles */
+    :root {
+        --blue-50: #eff6ff;
+        --blue-100: #dbeafe;
+        --blue-200: #bfdbfe;
+        --blue-500: #3b82f6;
+        --blue-600: #2563eb;
+        --indigo-100: #e0e7ff;
+        --indigo-600: #4f46e5;
+        --purple-600: #9333ea;
+        --pink-600: #db2777;
+        --green-600: #059669;
+        --teal-600: #0d9488;
+        --yellow-400: #facc15;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --rounded-full: 9999px;
+        --rounded-lg: 0.5rem;
+        --rounded-xl: 0.75rem;
+        --rounded-2xl: 1rem;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.5;
+        color: var(--gray-800);
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Animations */
     @keyframes fade-in {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -271,26 +325,116 @@
         animation: fade-in-up 0.5s ease-out forwards;
     }
 
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+    /* Page Container */
+    .page-container {
+        min-height: 100vh;
+        background: linear-gradient(to bottom right, var(--blue-50), var(--indigo-100));
+        padding: 2rem 1rem;
     }
 
-    /* Subjects Carousel */
+    @media (min-width: 640px) {
+        .page-container {
+            padding: 2rem 1.5rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .page-container {
+            padding: 2rem 2rem;
+        }
+    }
+
+    /* Search Container */
+    .search-container {
+        max-width: 80rem;
+        margin: 0 auto 2rem;
+    }
+
+    .search-form {
+        background: var(--white);
+        border-radius: var(--rounded-full);
+        box-shadow: var(--shadow-xl);
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input-container {
+        position: relative;
+        flex-grow: 1;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 3.5rem;
+        border: 0;
+        border-radius: var(--rounded-full);
+        font-size: 1.125rem;
+        color: var(--gray-700);
+        background: transparent;
+    }
+
+    .search-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--blue-500);
+    }
+
+    .search-input::placeholder {
+        color: var(--gray-400);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 1.5rem;
+        width: 1.5rem;
+        color: var(--blue-500);
+    }
+
+    .search-button {
+        background: linear-gradient(to right, var(--blue-500), var(--indigo-600));
+        color: var(--white);
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--rounded-full);
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-md);
+        margin-left: 0.5rem;
+    }
+
+    .search-button:hover {
+        background: linear-gradient(to right, var(--blue-600), var(--indigo-700));
+        transform: scale(1.05);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .search-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--blue-500);
+    }
+
+    /* Subjects Container */
+    .subjects-container {
+        max-width: 80rem;
+        margin: 0 auto 2rem;
+    }
+
     .subjects-swiper {
-        padding: 12px 4px;
+        padding: 0.75rem 0.25rem;
     }
 
-    .subjects-swiper .swiper-slide {
+    .subject-slide {
         width: auto !important;
-        margin-right: 8px;
+        margin-right: 0.5rem;
     }
 
     .subject-card {
-        background: white;
-        border-radius: 16px;
+        background: var(--white);
+        border-radius: 1rem;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         border: 2px solid transparent;
@@ -305,60 +449,257 @@
     }
 
     .active-subject {
-        border: 2px solid #3b82f6;
+        border: 2px solid var(--blue-500);
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     }
 
-    /* Hero Slider */
-    .hero-swiper {
-        height: 400px;
+    .subject-card-content {
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .subject-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: var(--rounded-full);
+        background: var(--blue-100);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .subject-card:hover .subject-icon {
+        background: var(--blue-200);
+    }
+
+    .subject-svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        color: var(--blue-600);
+        transition: all 0.3s ease;
+    }
+
+    .subject-card:hover .subject-svg {
+        transform: scale(1.1);
+    }
+
+    .subject-initial {
+        font-size: 1.125rem;
+        font-weight: bold;
+        color: var(--blue-600);
+        transition: all 0.3s ease;
+    }
+
+    .subject-card:hover .subject-initial {
+        transform: scale(1.1);
+    }
+
+    .subject-name {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        color: var(--gray-700);
+        font-weight: 500;
+        text-align: center;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Hero Container */
+    .hero-container {
+        max-width: 80rem;
+        margin: 0 auto 4rem;
         border-radius: 1rem;
         overflow: hidden;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .hero-swiper {
+        height: 25rem;
     }
 
     @media (max-width: 768px) {
         .hero-swiper {
-            height: 300px;
+            height: 18.75rem;
         }
+    }
+
+    .hero-slide {
+        position: relative;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        opacity: 0.7;
+    }
+
+    .blue-overlay {
+        background: linear-gradient(to right, var(--blue-600), var(--indigo-800));
+    }
+
+    .purple-overlay {
+        background: linear-gradient(to right, var(--purple-600), var(--pink-600));
+    }
+
+    .green-overlay {
+        background: linear-gradient(to right, var(--green-600), var(--teal-600));
+    }
+
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 2rem;
+    }
+
+    .hero-text {
+        max-width: 56rem;
+        color: var(--white);
+    }
+
+    .hero-title {
+        font-size: 2.25rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .hero-title {
+            font-size: 3rem;
+        }
+    }
+
+    .hero-description {
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (min-width: 640px) {
+        .hero-description {
+            font-size: 1.25rem;
+        }
+    }
+
+    .hero-button {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--rounded-full);
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .white-button {
+        background: var(--white);
+        color: var(--blue-600);
+    }
+
+    .white-button:hover {
+        background: var(--gray-100);
+    }
+
+    .white-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--white);
     }
 
     .hero-swiper .swiper-button-next,
     .hero-swiper .swiper-button-prev {
-        width: 40px;
-        height: 40px;
+        width: 2.5rem;
+        height: 2.5rem;
         background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(8px);
-        border-radius: 50%;
+        border-radius: var(--rounded-full);
+        color: var(--white);
     }
 
     .hero-swiper .swiper-button-next:after,
     .hero-swiper .swiper-button-prev:after {
         font-size: 1.2rem;
-        color: white;
     }
 
     .hero-swiper .swiper-pagination-bullet {
-        background: white;
+        background: var(--white);
         opacity: 0.6;
-        width: 10px;
-        height: 10px;
+        width: 0.625rem;
+        height: 0.625rem;
     }
 
     .hero-swiper .swiper-pagination-bullet-active {
-        background: white;
+        background: var(--white);
         opacity: 1;
-        width: 30px;
-        border-radius: 5px;
+        width: 1.875rem;
+        border-radius: 0.3125rem;
     }
 
-    /* Course Cards */
+    /* Courses Container */
+    .courses-container {
+        max-width: 80rem;
+        margin: 0 auto;
+    }
+
+    .courses-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--gray-800);
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    @media (min-width: 640px) {
+        .courses-title {
+            font-size: 2.25rem;
+        }
+    }
+
+    .courses-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 640px) {
+        .courses-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .courses-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    /* Course Card */
     .course-card {
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         outline: none;
     }
 
     .course-card:focus-visible {
-        outline: 2px solid #3b82f6;
+        outline: 2px solid var(--blue-500);
         outline-offset: 2px;
     }
 
@@ -367,14 +708,300 @@
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
 
+    .course-card-inner {
+        background: var(--white);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+    }
+
+    .course-card:hover .course-card-inner {
+        box-shadow: var(--shadow-xl);
+    }
+
+    .course-image-container {
+        position: relative;
+        overflow: hidden;
+        height: 12rem;
+        flex-shrink: 0;
+    }
+
+    .course-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
     .course-card:hover .course-image {
         transform: scale(1.05);
     }
 
-    /* Accessibility improvements */
-    [tabindex="0"]:focus {
-        outline: 2px solid #3b82f6;
-        outline-offset: 2px;
+    .course-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, var(--blue-100), var(--indigo-200));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .placeholder-icon {
+        width: 4rem;
+        height: 4rem;
+        color: var(--blue-400);
+    }
+
+    .course-subject-tag {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--white);
+        color: var(--blue-600);
+        font-size: 0.75rem;
+        font-weight: bold;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--rounded-full);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+    }
+
+    .course-card:hover .course-subject-tag {
+        background: var(--blue-600);
+        color: var(--white);
+    }
+
+    .course-content {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-meta {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .course-rating {
+        display: flex;
+        align-items: center;
+    }
+
+    .star-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--yellow-400);
+    }
+
+    .rating-text {
+        font-size: 0.875rem;
+        color: var(--gray-700);
+        margin-left: 0.25rem;
+    }
+
+    .meta-separator {
+        color: var(--gray-300);
+        margin: 0 0.5rem;
+    }
+
+    .course-modules {
+        font-size: 0.875rem;
+        color: var(--gray-500);
+    }
+
+    .course-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .course-card:hover .course-title {
+        color: var(--blue-600);
+    }
+
+    .course-description {
+        color: var(--gray-600);
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .course-footer {
+        display: flex;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    .instructor-info {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+    }
+
+    .instructor-avatar {
+        height: 2.5rem;
+        width: 2.5rem;
+        border-radius: var(--rounded-full);
+        background: var(--blue-100);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--blue-600);
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .course-card:hover .instructor-avatar {
+        background: var(--blue-200);
+    }
+
+    .instructor-details {
+        margin-left: 0.75rem;
+    }
+
+    .instructor-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-900);
+    }
+
+    .instructor-name {
+        font-size: 0.875rem;
+        color: var(--gray-500);
+    }
+
+    .course-price {
+        font-size: 1.125rem;
+        font-weight: bold;
+        color: var(--blue-600);
+    }
+
+    .free-badge {
+        background: var(--green-100);
+        color: var(--green-800);
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--rounded-full);
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 3rem;
+    }
+
+    .pagination-list {
+        display: inline-flex;
+        gap: 0.5rem;
+    }
+
+    .pagination-item {
+        list-style: none;
+    }
+
+    .pagination-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: var(--rounded-full);
+        background: var(--white);
+        color: var(--blue-600);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+    }
+
+    .pagination-link:hover {
+        background: var(--blue-50);
+        color: var(--blue-600);
+    }
+
+    .pagination-link:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--blue-500);
+    }
+
+    .pagination-active {
+        background: linear-gradient(to right, var(--blue-500), var(--indigo-600));
+        color: var(--white);
+    }
+
+    .pagination-arrow {
+        color: var(--blue-600);
+    }
+
+    .arrow-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    /* No Courses */
+    .no-courses {
+        text-align: center;
+        padding: 4rem 0;
+    }
+
+    .no-courses-icon {
+        width: 6rem;
+        height: 6rem;
+        background: var(--blue-100);
+        border-radius: var(--rounded-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .no-courses-svg {
+        width: 3rem;
+        height: 3rem;
+        color: var(--blue-500);
+    }
+
+    .no-courses-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--gray-800);
+        margin-bottom: 0.5rem;
+    }
+
+    .no-courses-message {
+        color: var(--gray-600);
+        max-width: 28rem;
+        margin: 0 auto;
+    }
+
+    .no-courses-button {
+        display: inline-block;
+        margin-top: 1.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--blue-600);
+        color: var(--white);
+        border-radius: var(--rounded-lg);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .no-courses-button:hover {
+        background: var(--blue-700);
+    }
+
+    .no-courses-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--blue-500);
     }
 </style>
 
@@ -444,7 +1071,7 @@
 
         // Add hover effect to course images
         document.querySelectorAll('.course-card').forEach(card => {
-            const img = card.querySelector('img');
+            const img = card.querySelector('.course-image');
             if (img) {
                 card.addEventListener('mouseenter', () => {
                     img.style.transform = 'scale(1.05)';

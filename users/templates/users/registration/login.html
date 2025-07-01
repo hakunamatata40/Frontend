@@ -5,155 +5,367 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-sm mt-10 transition-all duration-300">
-    <div class="flex justify-center mb-6">
-        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p>Please enter your credentials to access your account</p>
         </div>
-    </div>
 
-    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">
-        Welcome Back
-    </h2>
+        <form method="post" class="auth-form">
+            {% csrf_token %}
 
-    <form method="post" class="space-y-6">
-        {% csrf_token %}
-
-        <!-- Floating Label Inputs -->
-        {% for field in form %}
-        <div class="relative z-0 group">
-            {% if field.name == 'password' %}
-                <div class="relative">
-                    {{ field|add_class:"block py-1 px-2 w-full text-base text-gray-900 bg-transparent appearance-none focus:outline-none focus:ring-0 peer" }}
-                    <button type="button" class="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none toggle-password">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
+            {% for field in form %}
+            <div class="form-group">
+                <div class="input-container">
+                    {{ field|add_class:"form-input" }}
+                    <label for="{{ field.id_for_label }}" class="input-label">{{ field.label }}</label>
+                    <div class="input-underline"></div>
+                    
+                    {% if field.name == 'password' %}
+                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                        <i class="far fa-eye"></i>
                     </button>
+                    {% endif %}
                 </div>
-            {% else %}
-                {{ field|add_class:"block py-1 px-2 w-full text-base text-gray-900 bg-transparent appearance-none focus:outline-none focus:ring-0 peer" }}
-            {% endif %}
 
-            <label for="{{ field.id_for_label }}"
-                   class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                {{ field.label }}
-            </label>
+                {% for error in field.errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
 
-            <div class="h-px bg-gray-200 mt-1 peer-focus:bg-blue-600 transition-all duration-300"></div>
-
-            {% for error in field.errors %}
-                <p class="mt-2 text-red-500 text-xs animate-pulse">{{ error }}</p>
-            {% endfor %}
-
-            {% if field.help_text and field.name == 'password' %}
-                <div class="mt-2 text-xs text-gray-500 password-strength">
-                    <div class="flex items-center mb-1">
-                        <span class="strength-indicator mr-2"></span>
-                        <span class="strength-text"></span>
+                {% if field.help_text and field.name == 'password' %}
+                <div class="password-strength">
+                    <div class="strength-meter">
+                        <div class="strength-bar"></div>
                     </div>
-                    <div class="w-full bg-gray-100 rounded-full h-1">
-                        <div class="strength-bar h-1 rounded-full bg-gray-400"></div>
+                    <div class="strength-info">
+                        <span class="strength-indicator"><i class="fas fa-info-circle"></i></span>
+                        <span class="strength-text">Password strength</span>
                     </div>
                 </div>
-            {% endif %}
-        </div>
-        {% endfor %}
-
-        {% if form.non_field_errors %}
-        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg animate-bounce" role="alert">
-            {% for error in form.non_field_errors %}
-                <span class="font-medium">Error!</span> {{ error }}
+                {% endif %}
+            </div>
             {% endfor %}
-        </div>
-        {% endif %}
 
-        <button type="submit"
-                class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
-            Log In
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline ml-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-        </button>
-    </form>
+            {% if form.non_field_errors %}
+            <div class="auth-alert error">
+                {% for error in form.non_field_errors %}
+                <p><i class="fas fa-exclamation-circle"></i> {{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-    <div class="mt-8 pt-5">
-        <div class="text-center space-y-3">
-            <p class="text-gray-600 text-sm">
-                Don't have an account?
-                <a href="{% url 'signup' %}" class="text-blue-600 hover:underline hover:text-blue-700 transition duration-200 font-medium">
-                    Sign up
-                </a>
-            </p>
-            <p class="text-gray-600 text-sm">
-                <a href="{% url 'password_reset' %}"
-                   class="text-blue-600 hover:underline hover:text-blue-700 transition duration-200 font-medium">
-                    Forgot password?
-                </a>
-            </p>
+            <button type="submit" class="auth-button primary">
+                Log In <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{% url 'signup' %}" class="auth-link">Sign up</a></p>
+            <p><a href="{% url 'password_reset' %}" class="auth-link">Forgot password?</a></p>
         </div>
     </div>
 </div>
 
 <style>
-    /* Animation for input focus */
-    input:not(:placeholder-shown) ~ label,
-    input:focus ~ label {
-        color: #2563eb;
-        transform: translateY(-1.5rem) scale(0.75);
+    /* Auth Container */
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 160px);
+        padding: 2rem;
+        background-color: #f8f9fa;
     }
 
-    input {
-        padding: 5px 0;
+    /* Auth Card */
+    .auth-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        max-width: 450px;
+        padding: 2.5rem;
+        animation: fadeInUp 0.5s ease-out;
     }
 
-    /* Smooth transition for the form container */
-    .animate-form {
-        animation: fadeIn 0.5s ease-in-out;
+    /* Auth Header */
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    .auth-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        border-radius: 50%;
+        color: white;
+        font-size: 1.75rem;
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
     }
 
-    /* Password strength indicators */
-    .strength-weak {
-        background-color: #ef4444 !important;
+    .auth-header h2 {
+        font-size: 1.75rem;
+        color: #2b2d42;
+        margin-bottom: 0.5rem;
     }
-    .strength-medium {
-        background-color: #f59e0b !important;
+
+    .auth-header p {
+        color: #6c757d;
+        font-size: 0.95rem;
     }
-    .strength-strong {
-        background-color: #10b981 !important;
+
+    /* Form Styles */
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
     }
-    .strength-very-strong {
-        background-color: #3b82f6 !important;
+
+    .form-group {
+        position: relative;
+    }
+
+    .input-container {
+        position: relative;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 1rem 1rem 0.5rem 1rem;
+        border: none;
+        border-bottom: 1px solid #ced4da;
+        font-size: 1rem;
+        color: #495057;
+        background-color: transparent;
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-bottom-color: transparent;
+    }
+
+    .input-label {
+        position: absolute;
+        top: 1rem;
+        left: 0;
+        color: #6c757d;
+        font-size: 1rem;
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    .input-underline {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #4362ee9a, #390ca390);
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus ~ .input-label,
+    .form-input:not(:placeholder-shown) ~ .input-label {
+        top: 0;
+        font-size: 0.85rem;
+        color: #4362ee4a;
+    }
+
+    .form-input:focus ~ .input-underline {
+        width: 100%;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    .toggle-password:hover {
+        color: #4361ee;
+    }
+
+    /* Password Strength */
+    .password-strength {
+        margin-top: 0.5rem;
+    }
+
+    .strength-meter {
+        width: 100%;
+        height: 4px;
+        background-color: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 0.3rem;
+    }
+
+    .strength-bar {
+        height: 100%;
+        width: 0;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .strength-info {
+        display: flex;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .strength-indicator {
+        margin-right: 0.3rem;
+        font-size: 0.9rem;
+    }
+
+    /* Auth Button */
+    .auth-button {
+        padding: 0.9rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .auth-button.primary {
+        background: linear-gradient(90deg, #4361ee, #3a0ca3);
+        color: white;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .auth-button.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    /* Auth Footer */
+    .auth-footer {
+        margin-top: 1.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .auth-footer p {
+        margin: 0.5rem 0;
+    }
+
+    .auth-link {
+        color: #4361ee;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    .auth-link:hover {
+        color: #3a0ca3;
+        text-decoration: underline;
+    }
+
+    /* Error Messages */
+    .error-message {
+        color: #dc3545;
+        font-size: 0.8rem;
+        margin-top: 0.3rem;
+        animation: shake 0.5s;
+    }
+
+    .auth-alert {
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .auth-alert.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    .auth-alert p {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-5px); }
+        40%, 80% { transform: translateX(5px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 576px) {
+        .auth-container {
+            padding: 1rem;
+        }
+        
+        .auth-card {
+            padding: 1.5rem;
+        }
+        
+        .auth-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
     }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Add animation class to form container
-        const formContainer = document.querySelector('form');
-        if (formContainer) formContainer.classList.add('animate-form');
-
         // Toggle password visibility
         const togglePasswordButtons = document.querySelectorAll('.toggle-password');
         togglePasswordButtons.forEach(button => {
             button.addEventListener('click', function() {
-                const input = this.previousElementSibling;
-                const icon = this.querySelector('svg');
-
+                const input = this.parentElement.querySelector('.form-input');
+                const icon = this.querySelector('i');
+                
                 if (input.type === 'password') {
                     input.type = 'text';
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
                 } else {
                     input.type = 'password';
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
                 }
             });
         });
@@ -164,8 +376,8 @@
             passwordInput.addEventListener('input', function() {
                 const strengthBar = document.querySelector('.strength-bar');
                 const strengthText = document.querySelector('.strength-text');
-                const strengthIndicator = document.querySelector('.strength-indicator');
-
+                const strengthIndicator = document.querySelector('.strength-indicator i');
+                
                 if (!strengthBar || !strengthText) return;
 
                 const password = this.value;
@@ -187,53 +399,61 @@
                 // Update UI
                 let strengthLevel = '';
                 let width = '0%';
-                let colorClass = '';
+                let color = '#e9ecef';
+                let iconClass = 'fa-info-circle';
+                let iconColor = '#6c757d';
 
                 switch(strength) {
-                    case 0:
-                        strengthLevel = '';
-                        width = '0%';
-                        break;
                     case 1:
                         strengthLevel = 'Very weak';
-                        width = '20%';
-                        colorClass = 'strength-weak';
+                        width = '25%';
+                        color = '#dc3545';
+                        iconClass = 'fa-times-circle';
+                        iconColor = '#dc3545';
                         break;
                     case 2:
                         strengthLevel = 'Weak';
-                        width = '40%';
-                        colorClass = 'strength-weak';
+                        width = '50%';
+                        color = '#fd7e14';
+                        iconClass = 'fa-exclamation-circle';
+                        iconColor = '#fd7e14';
                         break;
                     case 3:
                         strengthLevel = 'Medium';
-                        width = '60%';
-                        colorClass = 'strength-medium';
+                        width = '75%';
+                        color = '#ffc107';
+                        iconClass = 'fa-check-circle';
+                        iconColor = '#ffc107';
                         break;
                     case 4:
                         strengthLevel = 'Strong';
-                        width = '80%';
-                        colorClass = 'strength-strong';
+                        width = '90%';
+                        color = '#28a745';
+                        iconClass = 'fa-check-circle';
+                        iconColor = '#28a745';
                         break;
                     case 5:
                         strengthLevel = 'Very strong';
                         width = '100%';
-                        colorClass = 'strength-very-strong';
+                        color = '#20c997';
+                        iconClass = 'fa-shield-alt';
+                        iconColor = '#20c997';
                         break;
+                    default:
+                        strengthLevel = 'Password strength';
+                        width = '0%';
+                        color = '#e9ecef';
+                        iconClass = 'fa-info-circle';
+                        iconColor = '#6c757d';
                 }
 
                 strengthBar.style.width = width;
-                strengthBar.className = `strength-bar h-1 rounded-full ${colorClass}`;
+                strengthBar.style.backgroundColor = color;
                 strengthText.textContent = strengthLevel;
-
-                // Update indicator icon
-                if (strength >= 4) {
-                    strengthIndicator.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>';
-                } else if (strength >= 2) {
-                    strengthIndicator.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>';
-                } else if (strength > 0) {
-                    strengthIndicator.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>';
-                } else {
-                    strengthIndicator.innerHTML = '';
+                
+                if (strengthIndicator) {
+                    strengthIndicator.className = `fas ${iconClass}`;
+                    strengthIndicator.style.color = iconColor;
                 }
             });
         }

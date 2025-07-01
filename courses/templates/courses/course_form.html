@@ -4,71 +4,550 @@
 {% block title %}{% if course %}Edit Course{% else %}Create New Course{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
-    {# Changed text-blue-600 to text-purple-600 #}
-    <h2 class="text-3xl font-bold text-center text-purple-600 mb-6">
-        {% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %}
-    </h2>
-    {# The enctype="multipart/form-data" is already correctly set, which is crucial for file uploads. #}
-    <form method="post" enctype="multipart/form-data" class="space-y-4">
-        {% csrf_token %}
-
-        {# --- NEW: Display current image if editing an existing course --- #}
-        {% if course and course.image %}
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Current Image:</label>
-                <img src="{{ course.image.url }}" alt="{{ course.title }}" class="w-48 h-auto object-cover rounded-lg shadow-sm border border-gray-200">
+<div class="course-form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2 class="form-title">
+                {% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %}
+            </h2>
+            <div class="form-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
             </div>
-        {% endif %}
-        {# --- END NEW SECTION --- #}
+        </div>
 
-        {# Manual form rendering starts here #}
-        {% for field in form %}
-            <div class="mb-4">
-                {# Display label #}
-                <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">
-                    {{ field.label }}
-                    {% if field.field.required %}
-                        <span class="text-red-500">*</span>
-                    {% endif %}
-                </label>
+        <form method="post" enctype="multipart/form-data" class="course-form">
+            {% csrf_token %}
 
-                {# Display the input field. Tailwind classes are applied in forms.py #}
-                {# Special handling for checkbox for better visual alignment #}
-                {% if field.field.widget.input_type == 'checkbox' %}
-                    <div class="flex items-center">
-                        {{ field }}
-                        <span class="ml-2 text-gray-700">{{ field.label }}</span> {# Label for checkbox #}
+            <!-- Display current image if editing -->
+            {% if course and course.image %}
+                <div class="current-image-container">
+                    <label class="current-image-label">Current Image:</label>
+                    <div class="image-preview">
+                        <img src="{{ course.image.url }}" alt="{{ course.title }}" class="current-image">
+                        <div class="image-overlay">
+                            <svg class="eye-icon" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
                     </div>
-                {% else %}
-                    {{ field }}
-                {% endif %}
+                </div>
+            {% endif %}
 
-                {# Display field errors #}
-                {% if field.errors %}
-                    <ul class="text-red-600 text-xs mt-1">
-                        {% for error in field.errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+            <!-- Display non-field errors if any -->
+            {% if form.non_field_errors %}
+                <div class="form-error">
+                    <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div class="error-content">
+                        <strong>Error!</strong>
+                        <p>{{ form.non_field_errors }}</p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Manual form rendering -->
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="form-label">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="required">*</span>
+                        {% endif %}
+                    </label>
 
-                {# Display help text #}
-                {% if field.help_text %}
-                    <p class="text-gray-600 text-xs italic mt-1">{{ field.help_text }}</p>
-                {% endif %}
-            </div>
-        {% endfor %}
-        {# Manual form rendering ends here #}
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                        <div class="checkbox-container">
+                            {{ field }}
+                            <span class="checkbox-label">{{ field.label }}</span>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
 
-        {# Changed bg-blue-600 to bg-purple-600 and hover:bg-blue-700 to hover:bg-purple-700 #}
-        <button type="submit" class="w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300">
-            {% if course %}Update Course{% else %}Create Course{% endif %}
-        </button>
-    </form>
-    <div class="text-center mt-4">
-        {# Changed text-blue-600 to text-purple-600 #}
-        <a href="{% url 'instructor_dashboard' %}" class="text-purple-600 hover:underline">Back to Dashboard</a>
+                    {% if field.errors %}
+                        <ul class="error-list">
+                            {% for error in field.errors %}
+                                <li>
+                                    <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    {{ error }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <p class="help-text">{{ field.help_text }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">
+                {% if course %}Update Course{% else %}Create Course{% endif %}
+                <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
+        </form>
+
+        <div class="form-footer">
+            <a href="{% url 'instructor_dashboard' %}" class="back-link">
+                <svg class="back-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
     </div>
 </div>
+
+<style>
+    /* Base Styles */
+    :root {
+        --primary: #7c3aed;
+        --primary-dark: #6d28d9;
+        --primary-light: #8b5cf6;
+        --secondary: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --rounded-sm: 0.125rem;
+        --rounded: 0.25rem;
+        --rounded-md: 0.375rem;
+        --rounded-lg: 0.5rem;
+        --rounded-xl: 0.75rem;
+        --rounded-2xl: 1rem;
+        --rounded-full: 9999px;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.5;
+        color: var(--gray-800);
+        background-color: var(--gray-100);
+    }
+
+    /* Form Container */
+    .course-form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    .form-card {
+        background: var(--white);
+        border-radius: var(--rounded-xl);
+        box-shadow: var(--shadow-xl);
+        width: 100%;
+        max-width: 42rem;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form Header */
+    .form-header {
+        background: linear-gradient(to right, var(--primary), var(--primary-light));
+        color: var(--white);
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .form-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-icon {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: var(--rounded-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem;
+    }
+
+    .form-icon svg {
+        width: 100%;
+        height: 100%;
+        stroke-width: 1.5;
+    }
+
+    /* Current Image Preview */
+    .current-image-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .current-image-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .image-preview {
+        position: relative;
+        width: 12rem;
+        height: auto;
+        border-radius: var(--rounded-lg);
+        overflow: hidden;
+        border: 1px solid var(--gray-200);
+    }
+
+    .current-image {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .image-preview:hover .image-overlay {
+        opacity: 1;
+    }
+
+    .eye-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        color: var(--white);
+    }
+
+    /* Form Body */
+    .course-form {
+        padding: 2rem;
+    }
+
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .required {
+        color: var(--danger);
+        margin-left: 0.25rem;
+    }
+
+    /* Input Fields */
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select,
+    input[type="file"] {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--rounded-md);
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background-color: var(--white);
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus,
+    input[type="file"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    }
+
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Checkbox Styling */
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+    }
+
+    input[type="checkbox"] {
+        width: auto;
+        margin-right: 0.5rem;
+        accent-color: var(--primary);
+    }
+
+    .checkbox-label {
+        font-size: 0.875rem;
+        color: var(--gray-700);
+    }
+
+    /* Error Styling */
+    .form-error {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 4px solid var(--danger);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        border-radius: var(--rounded-sm);
+    }
+
+    .error-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--danger);
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .error-content {
+        flex-grow: 1;
+    }
+
+    .error-content strong {
+        font-weight: 600;
+        color: var(--danger);
+    }
+
+    .error-content p {
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        color: var(--gray-700);
+    }
+
+    .error-list {
+        list-style: none;
+        margin-top: 0.5rem;
+    }
+
+    .error-list li {
+        font-size: 0.75rem;
+        color: var(--danger);
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.25rem;
+    }
+
+    .error-list .error-icon {
+        width: 1rem;
+        height: 1rem;
+        margin-right: 0.5rem;
+    }
+
+    /* Help Text */
+    .help-text {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        width: 100%;
+        background: linear-gradient(to right, var(--primary), var(--primary-light));
+        color: var(--white);
+        padding: 1rem;
+        border: none;
+        border-radius: var(--rounded-lg);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .submit-btn:hover {
+        background: linear-gradient(to right, var(--primary-dark), var(--primary));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .btn-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-left: 0.5rem;
+    }
+
+    /* Form Footer */
+    .form-footer {
+        padding: 0 2rem 2rem;
+        text-align: center;
+    }
+
+    .back-link {
+        color: var(--primary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    .back-icon {
+        width: 1rem;
+        height: 1rem;
+        margin-right: 0.5rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .course-form-container {
+            padding: 1rem;
+        }
+
+        .form-header {
+            padding: 1.5rem;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+        }
+
+        .course-form {
+            padding: 1.5rem;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-width: 12rem;
+        }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-card {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add focus styles to form elements
+        const formInputs = document.querySelectorAll('input, textarea, select');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.borderColor = 'var(--primary)';
+                this.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.2)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.style.borderColor = 'var(--gray-300)';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Add hover effect to submit button
+        const submitBtn = document.querySelector('.submit-btn');
+        if (submitBtn) {
+            submitBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 8px rgba(124, 58, 237, 0.3)';
+            });
+
+            submitBtn.addEventListener('mouseleave', function() {
+                if (document.activeElement !== this) {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                }
+            });
+        }
+
+        // Preview image when file is selected
+        const imageInput = document.querySelector('input[type="file"]');
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const previewContainer = document.querySelector('.current-image-container');
+                        if (!previewContainer.querySelector('.image-preview')) {
+                            const previewHTML = `
+                                <div class="image-preview">
+                                    <img src="${event.target.result}" class="current-image">
+                                    <div class="image-overlay">
+                                        <svg class="eye-icon" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            `;
+                            previewContainer.insertAdjacentHTML('beforeend', previewHTML);
+                        } else {
+                            previewContainer.querySelector('.current-image').src = event.target.result;
+                        }
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
