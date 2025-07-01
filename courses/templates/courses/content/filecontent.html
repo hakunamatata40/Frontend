@@ -1,5 +1,308 @@
-<a href="{{ item.file.url }}" download class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">
-    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l3-3m-3 3l-3-3m-3 8h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-    Download File: {{ item.file.name|split:'/'|last }}
-</a>
-<p class="text-sm text-gray-500 mt-2">File type: {{ item.file.url|cut:'.'|slice:'-1:' }} ({{ item.file.size|filesizeformat }})</p>
+<div class="file-content-container animated fadeIn">
+    <div class="file-card hover-grow">
+        <div class="file-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+        </div>
+        <div class="file-details">
+            <h4 class="file-title">{{ item.file.name|split:'/'|last }}</h4>
+            <div class="file-meta">
+                <span class="file-type">{{ item.file.url|cut:'.'|slice:'-1:'|upper }}</span>
+                <span class="file-size">{{ item.file.size|filesizeformat }}</span>
+            </div>
+            <div class="file-actions">
+                <a href="{{ item.file.url }}" download class="download-btn">
+                    Download
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </a>
+                <button class="preview-btn" data-url="{{ item.file.url }}">
+                    Preview
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes hoverGrow {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+
+    .animated {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .hover-grow:hover {
+        animation: hoverGrow 0.5s ease;
+    }
+
+    /* File Content Styles */
+    .file-content-container {
+        margin: 2rem 0;
+    }
+
+    .file-card {
+        background: var(--white);
+        border-radius: var(--rounded-xl);
+        box-shadow: var(--shadow-md);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--primary);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .file-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(108, 92, 231, 0));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .file-card:hover:before {
+        opacity: 1;
+    }
+
+    .file-icon {
+        width: 4rem;
+        height: 4rem;
+        background: rgba(108, 92, 231, 0.1);
+        border-radius: var(--rounded);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .file-card:hover .file-icon {
+        background: rgba(108, 92, 231, 0.2);
+        transform: rotate(5deg);
+    }
+
+    .file-icon svg {
+        width: 2rem;
+        height: 2rem;
+        color: var(--primary);
+    }
+
+    .file-details {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .file-title {
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .file-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .file-type {
+        background: var(--gray-100);
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--rounded-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--primary-dark);
+        letter-spacing: 0.05em;
+    }
+
+    .file-size {
+        font-size: 0.875rem;
+        color: var(--gray-500);
+    }
+
+    .file-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .download-btn,
+    .preview-btn {
+        padding: 0.5rem 1rem;
+        border-radius: var(--rounded);
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .download-btn {
+        background: var(--primary);
+        color: var(--white);
+    }
+
+    .download-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(108, 92, 231, 0.3);
+    }
+
+    .preview-btn {
+        background: var(--gray-100);
+        color: var(--gray-700);
+    }
+
+    .preview-btn:hover {
+        background: var(--gray-200);
+        transform: translateY(-2px);
+    }
+
+    .download-btn svg,
+    .preview-btn svg {
+        width: 1rem;
+        height: 1rem;
+        margin-left: 0.5rem;
+    }
+
+    /* Preview Modal */
+    .preview-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .preview-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .preview-content {
+        background: white;
+        border-radius: var(--rounded);
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow: auto;
+        position: relative;
+        transform: scale(0.9);
+        transition: all 0.3s ease;
+    }
+
+    .preview-modal.active .preview-content {
+        transform: scale(1);
+    }
+
+    .close-preview {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--danger);
+        color: white;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 640px) {
+        .file-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .file-icon {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+
+        .file-actions {
+            width: 100%;
+        }
+
+        .download-btn,
+        .preview-btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Preview functionality
+    const previewBtns = document.querySelectorAll('.preview-btn');
+    const previewModal = document.createElement('div');
+    previewModal.className = 'preview-modal';
+    previewModal.innerHTML = `
+        <div class="preview-content">
+            <div class="close-preview">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <iframe id="file-preview" style="width:100%; height:80vh; border:none;"></iframe>
+        </div>
+    `;
+    document.body.appendChild(previewModal);
+
+    const closePreview = previewModal.querySelector('.close-preview');
+    closePreview.addEventListener('click', function() {
+        previewModal.classList.remove('active');
+    });
+
+    previewBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const fileUrl = this.getAttribute('data-url');
+            const iframe = previewModal.querySelector('#file-preview');
+            iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+            previewModal.classList.add('active');
+        });
+    });
+
+    // Close modal when clicking outside
+    previewModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+</script>

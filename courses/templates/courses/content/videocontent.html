@@ -1,8 +1,387 @@
-<div class="relative w-full overflow-hidden" style="padding-top: 56.25%;"> {# 16:9 aspect ratio #}
-    <iframe class="absolute top-0 left-0 w-full h-full"
-            src="{{ item.video_url }}"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen></iframe>
+<div class="video-content-container animated fadeIn">
+    <div class="video-card hover-shake">
+        <div class="video-wrapper">
+            <iframe class="video-embed"
+                    src="{{ item.video_url }}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+        </div>
+        
+        <div class="video-meta">
+            {% if item.title %}
+            <h3 class="video-title">{{ item.title }}</h3>
+            {% endif %}
+            
+            <div class="video-actions">
+                <a href="{{ item.video_url }}" target="_blank" class="video-action-btn">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                    </svg>
+                    Watch on Source
+                </a>
+                
+                <button class="share-btn">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"></path>
+                    </svg>
+                    Share
+                </button>
+            </div>
+            
+            {% if item.description %}
+            <div class="video-description">
+                {{ item.description }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
-<p class="text-sm text-gray-500 mt-2">Video URL: <a href="{{ item.video_url }}" target="_blank" class="text-blue-500 hover:underline break-all">{{ item.video_url }}</a></p>
+
+<!-- Share Modal -->
+<div class="share-modal">
+    <div class="share-content">
+        <span class="close-share">&times;</span>
+        <h3>Share This Video</h3>
+        <div class="share-input-group">
+            <input type="text" id="share-url" value="{{ item.video_url }}" readonly>
+            <button class="copy-url-btn">Copy</button>
+        </div>
+        <div class="social-share">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ item.video_url|urlencode }}" target="_blank" class="social-icon facebook">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
+                </svg>
+            </a>
+            <a href="https://twitter.com/intent/tweet?url={{ item.video_url|urlencode }}" target="_blank" class="social-icon twitter">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
+                </svg>
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ item.video_url|urlencode }}" target="_blank" class="social-icon linkedin">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"></path>
+                    <rect x="2" y="9" width="4" height="12"></rect>
+                    <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .animated {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .hover-shake:hover {
+        animation: shake 0.5s ease;
+    }
+
+    /* Video Content Styles */
+    .video-content-container {
+        margin: 2rem 0;
+    }
+
+    .video-card {
+        background: var(--white);
+        border-radius: var(--rounded-xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .video-wrapper {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        overflow: hidden;
+    }
+
+    .video-embed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .video-meta {
+        padding: 1.5rem;
+    }
+
+    .video-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 1rem;
+    }
+
+    .video-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .video-action-btn,
+    .share-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--rounded);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .video-action-btn {
+        background: var(--primary);
+        color: var(--white);
+    }
+
+    .video-action-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    .share-btn {
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border: none;
+        cursor: pointer;
+    }
+
+    .share-btn:hover {
+        background: var(--gray-200);
+        transform: translateY(-2px);
+    }
+
+    .video-action-btn svg,
+    .share-btn svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-right: 0.5rem;
+    }
+
+    .video-description {
+        color: var(--gray-600);
+        line-height: 1.6;
+        padding-top: 1rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    /* Share Modal Styles */
+    .share-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .share-content {
+        background: white;
+        border-radius: var(--rounded-xl);
+        padding: 2rem;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+    }
+
+    .close-share {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray-500);
+        transition: color 0.3s;
+    }
+
+    .close-share:hover {
+        color: var(--danger);
+    }
+
+    .share-content h3 {
+        margin-bottom: 1.5rem;
+        color: var(--gray-800);
+    }
+
+    .share-input-group {
+        display: flex;
+        margin-bottom: 1.5rem;
+    }
+
+    .share-input-group input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--rounded) 0 0 var(--rounded);
+        border-right: none;
+    }
+
+    .copy-url-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0 1.5rem;
+        border-radius: 0 var(--rounded) var(--rounded) 0;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .copy-url-btn:hover {
+        background: var(--primary-dark);
+    }
+
+    .social-share {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .social-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s;
+    }
+
+    .social-icon:hover {
+        transform: translateY(-5px);
+    }
+
+    .social-icon svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .facebook {
+        background: #3b5998;
+        color: white;
+    }
+
+    .twitter {
+        background: #1da1f2;
+        color: white;
+    }
+
+    .linkedin {
+        background: #0077b5;
+        color: white;
+    }
+
+    /* Toast Notification */
+    .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: var(--rounded);
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .toast.show {
+        opacity: 1;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .video-actions {
+            flex-direction: column;
+        }
+        
+        .video-action-btn,
+        .share-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Share functionality
+    const shareBtn = document.querySelector('.share-btn');
+    const shareModal = document.querySelector('.share-modal');
+    const closeShare = document.querySelector('.close-share');
+    const copyUrlBtn = document.querySelector('.copy-url-btn');
+
+    if (shareBtn) {
+        shareBtn.addEventListener('click', function() {
+            shareModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (closeShare) {
+        closeShare.addEventListener('click', function() {
+            shareModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+
+    if (copyUrlBtn) {
+        copyUrlBtn.addEventListener('click', function() {
+            const shareUrl = document.getElementById('share-url');
+            shareUrl.select();
+            document.execCommand('copy');
+            
+            showToast('Link copied to clipboard!');
+        });
+    }
+
+    // Close modal when clicking outside
+    shareModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+});
+</script>

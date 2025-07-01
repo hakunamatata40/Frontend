@@ -1,3 +1,272 @@
-<div class="prose max-w-none"> {# Tailwind's prose plugin for rich text #}
-    {{ item.content|safe }} {# Use |safe if content might contain HTML (e.g., from a rich text editor) #}
+<div class="text-content-container animated fadeIn">
+    <div class="text-content-card hover-glow">
+        <div class="text-content">
+            {{ item.content|safe }}
+        </div>
+        <div class="text-actions">
+            <button class="copy-btn">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
+                </svg>
+                Copy Text
+            </button>
+            <button class="print-btn">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"></path>
+                </svg>
+                Print
+            </button>
+        </div>
+    </div>
 </div>
+
+<style>
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes glow {
+        0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.4); }
+        50% { box-shadow: 0 0 20px 10px rgba(108, 92, 231, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); }
+    }
+
+    .animated {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .hover-glow:hover {
+        animation: glow 2s ease infinite;
+    }
+
+    /* Text Content Styles */
+    .text-content-container {
+        margin: 2rem 0;
+    }
+
+    .text-content-card {
+        background: var(--white);
+        border-radius: var(--rounded-xl);
+        box-shadow: var(--shadow-md);
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .text-content-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary);
+    }
+
+    .text-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--gray-700);
+    }
+
+    .text-content p {
+        margin-bottom: 1.5rem;
+    }
+
+    .text-content h1,
+    .text-content h2,
+    .text-content h3,
+    .text-content h4 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: var(--gray-800);
+    }
+
+    .text-content h1 {
+        font-size: 2rem;
+        border-bottom: 2px solid var(--gray-200);
+        padding-bottom: 0.5rem;
+    }
+
+    .text-content h2 {
+        font-size: 1.75rem;
+    }
+
+    .text-content h3 {
+        font-size: 1.5rem;
+    }
+
+    .text-content h4 {
+        font-size: 1.25rem;
+    }
+
+    .text-content a {
+        color: var(--primary);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    .text-content a:hover {
+        color: var(--primary-dark);
+        border-bottom-style: solid;
+    }
+
+    .text-content ul,
+    .text-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+
+    .text-content li {
+        margin-bottom: 0.5rem;
+    }
+
+    .text-content blockquote {
+        border-left: 4px solid var(--primary);
+        background: var(--gray-100);
+        padding: 1rem 1.5rem;
+        margin: 1.5rem 0;
+        font-style: italic;
+        color: var(--gray-600);
+    }
+
+    .text-content pre {
+        background: var(--gray-800);
+        color: white;
+        padding: 1rem;
+        border-radius: var(--rounded);
+        overflow-x: auto;
+        margin-bottom: 1.5rem;
+    }
+
+    .text-content code {
+        font-family: 'Courier New', Courier, monospace;
+        background: var(--gray-100);
+        padding: 0.2rem 0.4rem;
+        border-radius: var(--rounded-sm);
+        font-size: 0.9rem;
+    }
+
+    .text-content pre code {
+        background: transparent;
+        padding: 0;
+    }
+
+    .text-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        border-top: 1px solid var(--gray-200);
+        padding-top: 1.5rem;
+    }
+
+    .copy-btn,
+    .print-btn {
+        padding: 0.5rem 1rem;
+        border-radius: var(--rounded);
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border: none;
+        cursor: pointer;
+    }
+
+    .copy-btn:hover,
+    .print-btn:hover {
+        background: var(--gray-200);
+        transform: translateY(-2px);
+    }
+
+    .copy-btn svg,
+    .print-btn svg {
+        width: 1rem;
+        height: 1rem;
+        margin-right: 0.5rem;
+    }
+
+    /* Toast Notification */
+    .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: var(--rounded);
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .toast.show {
+        opacity: 1;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .text-content-card {
+            padding: 1.5rem;
+        }
+        
+        .text-content {
+            font-size: 1rem;
+        }
+        
+        .text-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Copy text functionality
+    const copyBtn = document.querySelector('.copy-btn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            const textContent = document.querySelector('.text-content').innerText;
+            navigator.clipboard.writeText(textContent).then(() => {
+                showToast('Text copied to clipboard!');
+            });
+        });
+    }
+
+    // Print functionality
+    const printBtn = document.querySelector('.print-btn');
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            window.print();
+        });
+    }
+
+    // Toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+});
+</script>

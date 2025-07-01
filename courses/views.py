@@ -76,6 +76,7 @@ class CourseListView(ListView):
         context['subjects'] = Subject.objects.annotate(total_courses=Count('courses', filter=Q(courses__is_published=True)))
         context['current_subject_slug'] = self.kwargs.get('subject_slug')
         context['query'] = self.request.GET.get('q', '')
+        
         return context
 
 
@@ -287,7 +288,8 @@ class ContentCreateUpdateView(LoginRequiredMixin, InstructorRequiredMixin, View)
                 )
                 # Auto-assign order if not provided
                 if content_obj.order is None:
-                    max_order = module.contents.aggregate(models.Max('order'))['max_order']
+                    # Par exemple, calculer le max_order à partir des contenus existants
+                    max_order = request.POST.get('max_order', 0)
                     content_obj.order = (max_order or 0) + 1
                 content_obj.save()
             else: # If updating existing Content object (only on update)

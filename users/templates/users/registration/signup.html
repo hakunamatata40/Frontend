@@ -7,903 +7,450 @@
 {% block content %}
 <div class="signup-container">
     <div class="signup-card">
-        <!-- Progress Indicator -->
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 25%"></div>
-            </div>
-            
-            <div class="steps">
-                {% for step in "1234" %}
-                <div class="step {% if forloop.counter == 1 %}active{% endif %}" data-step="{{ forloop.counter }}">
-                    <div class="step-number">{{ forloop.counter }}</div>
-                    <div class="step-label">
-                        {% if forloop.counter == 1 %}Information{% elif forloop.counter == 2 %}Profile{% elif forloop.counter == 3 %}Interests{% else %}Confirm{% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+        <div class="signup-header">
+            <h2>Create an Account</h2>
+            <div class="header-wave"></div>
         </div>
-
-        <!-- Multi-step Form -->
-        <form method="post" enctype="multipart/form-data" id="signupForm">
+        
+        <form method="post" enctype="multipart/form-data" class="signup-form">
             {% csrf_token %}
             
-            <!-- Step 1: Basic Information -->
-            <div id="step1" class="step-content active">
-                <div class="step-header">
-                    <h2>Basic Information</h2>
-                    <p>Enter your account details</p>
-                </div>
-                
-                <div class="form-grid">
-                    {% for field in form %}
-                        {% if field.name in 'username,email,password1,password2' %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}">
-                                {{ field.label }}
-                                {% if field.field.required %}<span class="required">*</span>{% endif %}
-                            </label>
-                            {{ field|add_class:"form-input" }}
-                            
-                            {% if field.help_text %}
-                                <div class="help-text">{{ field.help_text }}</div>
-                            {% endif %}
-                            
-                            {% for error in field.errors %}
-                                <div class="error-message">{{ error }}</div>
+            {% for field in form %}
+                <div class="form-group" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:50 }}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="required">*</span>{% endif %}
+                    </label>
+                    
+                    {% if field.name == 'interests' %}
+                        <div class="bubble-container">
+                            {% for choice in field %}
+                                <label class="bubble-checkbox">
+                                    <input type="checkbox"
+                                           name="{{ choice.name }}"
+                                           value="{{ choice.value }}"
+                                           id="{{ choice.id_for_label }}"
+                                           {% if choice.data.selected %}checked{% endif %}>
+                                    <span class="bubble">{{ choice.choice_label }}</span>
+                                </label>
                             {% endfor %}
                         </div>
-                        {% endif %}
+                    {% else %}
+                        {{ field|add_class:"form-input" }}
+                    {% endif %}
+                    
+                    {% if field.help_text %}
+                        <p class="help-text">{{ field.help_text }}</p>
+                    {% endif %}
+                    
+                    {% for error in field.errors %}
+                        <p class="error-text">{{ error }}</p>
                     {% endfor %}
                 </div>
-                
-                <div class="step-actions">
-                    <button type="button" class="btn next-step">Next <i class="fas fa-arrow-right"></i></button>
-                </div>
-            </div>
+            {% endfor %}
             
-            <!-- Step 2: Profile -->
-            <div id="step2" class="step-content">
-                <div class="step-header">
-                    <h2>Your Profile</h2>
-                    <p>Tell us more about yourself</p>
-                </div>
-                
-                <div class="avatar-upload">
-                    <div class="avatar-preview" id="avatarPreview">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <input type="file" id="id_profile_picture" name="profile_picture" accept="image/*">
-                    <label for="id_profile_picture" class="avatar-upload-btn">
-                        <i class="fas fa-camera"></i>
-                    </label>
-                    <div class="avatar-note">Max 2MB (JPG, PNG)</div>
-                </div>
-                
-                <div class="form-grid">
-                    {% for field in form %}
-                        {% if field.name in 'first_name,last_name,gender,birth_date' %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}">
-                                {{ field.label }}
-                                {% if field.field.required %}<span class="required">*</span>{% endif %}
-                            </label>
-                            {{ field|add_class:"form-input" }}
-                            
-                            {% for error in field.errors %}
-                                <div class="error-message">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+            {% if form.non_field_errors %}
+                <div class="form-error" data-aos="fade-in">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
                     {% endfor %}
-                    
-                    <div class="form-group">
-                        <label for="id_pedagogic_level">
-                            Pedagogic Level <span class="required">*</span>
-                        </label>
-                        {{ form.pedagogic_level|add_class:"form-input" }}
-                    </div>
                 </div>
-                
-                <div class="step-actions">
-                    <button type="button" class="btn btn-outline prev-step"><i class="fas fa-arrow-left"></i> Back</button>
-                    <button type="button" class="btn next-step">Next <i class="fas fa-arrow-right"></i></button>
-                </div>
-            </div>
+            {% endif %}
             
-            <!-- Step 3: Interests -->
-            <div id="step3" class="step-content">
-                <div class="step-header">
-                    <h2>Your Interests</h2>
-                    <p>Select at least 3 topics that interest you</p>
-                </div>
-                
-                <div class="interests-grid">
-                    {% with form.interests as interests_field %}
-                        {% for choice in interests_field %}
-                            <label for="{{ choice.id_for_label }}" class="interest-card">
-                                <input type="checkbox" name="{{ choice.name }}" value="{{ choice.value }}" id="{{ choice.id_for_label }}" {% if choice.data.selected %}checked{% endif %}>
-                                <div class="interest-content">
-                                    <span>{{ choice.choice_label }}</span>
-                                </div>
-                            </label>
-                        {% endfor %}
-                    {% endwith %}
-                </div>
-                
-                <div class="step-actions">
-                    <button type="button" class="btn btn-outline prev-step"><i class="fas fa-arrow-left"></i> Back</button>
-                    <button type="button" class="btn next-step">Next <i class="fas fa-arrow-right"></i></button>
-                </div>
-            </div>
-            
-            <!-- Step 4: Confirmation -->
-            <div id="step4" class="step-content">
-                <div class="step-header">
-                    <h2>Confirmation</h2>
-                    <p>Review your information before submitting</p>
-                </div>
-                
-                <div class="review-card">
-                    <div class="review-section">
-                        <h3>Account Information</h3>
-                        <div class="review-item">
-                            <span>Full Name:</span>
-                            <span id="review-fullname">-</span>
-                        </div>
-                        <div class="review-item">
-                            <span>Email:</span>
-                            <span id="review-email">-</span>
-                        </div>
-                    </div>
-                    
-                    <div class="review-section">
-                        <h3>Personal Details</h3>
-                        <div class="review-item">
-                            <span>Birth Date:</span>
-                            <span id="review-birthdate">-</span>
-                        </div>
-                        <div class="review-item">
-                            <span>Pedagogic Level:</span>
-                            <span id="review-level">-</span>
-                        </div>
-                    </div>
-                    
-                    <div class="review-section">
-                        <h3>Interests</h3>
-                        <div class="review-item full-width">
-                            <span id="review-interests">-</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="terms-agreement">
-                    <input type="checkbox" id="terms" name="terms" required>
-                    <label for="terms">
-                        I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>
-                    </label>
-                </div>
-                
-                <div class="step-actions">
-                    <button type="button" class="btn btn-outline prev-step"><i class="fas fa-arrow-left"></i> Back</button>
-                    <button type="submit" class="btn btn-success">Complete Registration <i class="fas fa-check"></i></button>
-                </div>
-            </div>
+            <button type="submit" class="submit-btn">
+                Sign Up
+                <span class="btn-wave"></span>
+            </button>
         </form>
+        
+        <div class="login-link">
+            Already have an account? <a href="{% url 'login' %}">Log in</a>
+        </div>
     </div>
 </div>
 
 <style>
-    /* Main Container */
-    .signup-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: calc(100vh - 160px);
-        padding: 2rem;
-        background-color: #f8f9fa;
-    }
-    
-    /* Signup Card */
+:root {
+    --primary-color: #6c5ce7;
+    --secondary-color: #a29bfe;
+    --accent-color: #fd79a8;
+    --dark-color: #2d3436;
+    --light-color: #f5f6fa;
+    --success-color: #00b894;
+    --error-color: #d63031;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f9f9ff;
+    background-image: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.05) 0%, transparent 100%);
+}
+
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.signup-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(108, 92, 231, 0.15);
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    margin: 1rem;
+}
+
+.signup-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.signup-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.signup-header h2 {
+    font-size: 1.8rem;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.header-wave {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 10px;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 120 10" xmlns="http://www.w3.org/2000/svg"><path d="M0,5 C20,10 40,0 60,5 C80,10 100,0 120,5" stroke="%236c5ce7" fill="none" stroke-width="1"/></svg>') repeat-x;
+    animation: wave 2s linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes wave {
+    0% { background-position-x: 0; }
+    100% { background-position-x: 100px; }
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+}
+
+.required {
+    color: var(--error-color);
+    margin-left: 3px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+    background-color: white;
+}
+
+/* Bubble checkbox styles */
+.bubble-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.bubble-checkbox {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+.bubble-checkbox input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.bubble {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    background-color: #f0f0f0;
+    color: var(--dark-color);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    border: 1px solid #ddd;
+}
+
+.bubble-checkbox input:checked + .bubble {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.bubble-checkbox:hover .bubble {
+    background-color: #e0e0e0;
+}
+
+.bubble-checkbox input:focus + .bubble {
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+}
+
+.help-text {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.3rem;
+    font-style: italic;
+}
+
+.error-text {
+    font-size: 0.75rem;
+    color: var(--error-color);
+    margin-top: 0.3rem;
+}
+
+.form-error {
+    background-color: rgba(214, 48, 49, 0.1);
+    border-left: 3px solid var(--error-color);
+    padding: 0.8rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+}
+
+.form-error p {
+    color: var(--error-color);
+    font-size: 0.85rem;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 0.9rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+}
+
+.btn-wave {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+}
+
+.submit-btn:hover .btn-wave {
+    left: 100%;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.login-link a {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+    color: var(--secondary-color);
+}
+
+/* Animations */
+[data-aos] {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+[data-aos="fade-up"] {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+[data-aos="fade-up"].aos-animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+[data-aos="fade-in"] {
+    opacity: 0;
+}
+
+[data-aos="fade-in"].aos-animate {
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
     .signup-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        width: 100%;
-        max-width: 800px;
-        padding: 2.5rem;
-        animation: fadeInUp 0.5s ease-out;
+        padding: 1.5rem;
     }
     
-    /* Progress Indicator */
-    .progress-container {
-        margin-bottom: 2.5rem;
-        position: relative;
+    .signup-header h2 {
+        font-size: 1.6rem;
     }
     
-    .progress-bar {
-        height: 6px;
-        background-color: #e9ecef;
-        border-radius: 3px;
-        position: absolute;
-        top: 20px;
-        left: 0;
-        right: 0;
-        z-index: 1;
+    .form-input {
+        padding: 0.7rem 0.9rem;
     }
     
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #4361ee, #3a0ca3);
-        border-radius: 3px;
-        transition: width 0.5s ease;
+    .bubble {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .signup-card {
+        padding: 1.25rem;
+        margin: 0.5rem;
     }
     
-    .steps {
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-        z-index: 2;
+    .signup-header h2 {
+        font-size: 1.4rem;
     }
     
-    .step {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
+    .form-input {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
     }
     
-    .step-number {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: #e9ecef;
-        color: #6c757d;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-        border: 3px solid white;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .step.active .step-number {
-        background: linear-gradient(135deg, #4361ee, #3a0ca3);
-        color: white;
-        transform: scale(1.1);
-        box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
-    }
-    
-    .step.completed .step-number {
-        background-color: #28a745;
-        color: white;
-    }
-    
-    .step-label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #6c757d;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .step.active .step-label {
-        color: #4361ee;
-        font-weight: 600;
-    }
-    
-    /* Step Content */
-    .step-content {
-        display: none;
-        animation: fadeIn 0.5s ease;
-    }
-    
-    .step-content.active {
-        display: block;
-    }
-    
-    .step-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    
-    .step-header h2 {
-        font-size: 1.75rem;
-        color: #2b2d42;
-        margin-bottom: 0.5rem;
-    }
-    
-    .step-header p {
-        color: #6c757d;
+    .submit-btn {
+        padding: 0.8rem;
         font-size: 0.95rem;
     }
     
-    /* Form Grid */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+    .bubble-container {
+        gap: 0.4rem;
+    }
+    
+    .bubble {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .signup-card {
+        padding: 1rem;
+    }
+    
+    .signup-header h2 {
+        font-size: 1.3rem;
     }
     
     .form-group {
         margin-bottom: 1rem;
     }
     
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #495057;
-        font-size: 0.9rem;
+    .bubble {
+        padding: 0.35rem 0.7rem;
     }
-    
-    .required {
-        color: #dc3545;
-        margin-left: 0.2rem;
-    }
-    
-    .form-input {
-        width: 100%;
-        padding: 0.8rem 1rem;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-    }
-    
-    .form-input:focus {
-        outline: none;
-        border-color: #4361ee;
-        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-    }
-    
-    select.form-input {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
-        background-size: 12px;
-    }
-    
-    .help-text {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-top: 0.3rem;
-    }
-    
-    /* Avatar Upload */
-    .avatar-upload {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-    
-    .avatar-preview {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background-color: #f1f3f5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #adb5bd;
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        position: relative;
-        overflow: hidden;
-        border: 3px dashed #dee2e6;
-        transition: all 0.3s ease;
-    }
-    
-    .avatar-preview:hover {
-        border-color: #adb5bd;
-    }
-    
-    .avatar-preview img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    #id_profile_picture {
-        display: none;
-    }
-    
-    .avatar-upload-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #4361ee, #3a0ca3);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    
-    .avatar-upload-btn:hover {
-        transform: scale(1.1);
-    }
-    
-    .avatar-note {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-top: 0.5rem;
-    }
-    
-    /* Interests Grid */
-    .interests-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-    
-    .interest-card {
-        position: relative;
-    }
-    
-    .interest-card input {
-        position: absolute;
-        opacity: 0;
-    }
-    
-    .interest-content {
-        padding: 1rem;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background-color: white;
-    }
-    
-    .interest-card input:checked + .interest-content {
-        background: linear-gradient(135deg, #4361ee, #3a0ca3);
-        color: white;
-        border-color: transparent;
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-    }
-    
-    /* Review Card */
-    .review-card {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .review-section {
-        margin-bottom: 1.5rem;
-    }
-    
-    .review-section:last-child {
-        margin-bottom: 0;
-    }
-    
-    .review-section h3 {
-        font-size: 1rem;
-        color: #4361ee;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #dee2e6;
-    }
-    
-    .review-item {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.8rem;
-    }
-    
-    .review-item.full-width {
-        flex-direction: column;
-    }
-    
-    .review-item span:first-child {
-        font-weight: 500;
-        color: #495057;
-    }
-    
-    .review-item span:last-child {
-        color: #6c757d;
-    }
-    
-    /* Terms Agreement */
-    .terms-agreement {
-        display: flex;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-    
-    .terms-agreement input {
-        margin-right: 0.8rem;
-    }
-    
-    .terms-agreement label {
-        font-size: 0.9rem;
-        color: #495057;
-    }
-    
-    .terms-link {
-        color: #4361ee;
-        text-decoration: none;
-    }
-    
-    .terms-link:hover {
-        text-decoration: underline;
-    }
-    
-    /* Step Actions */
-    .step-actions {
-        display: flex;
-        justify-content: space-between;
-    }
-    
-    .btn {
-        padding: 0.8rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
-        font-size: 0.95rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        border: none;
-    }
-    
-    .btn-outline {
-        background-color: transparent;
-        border: 1px solid #ced4da;
-        color: #495057;
-    }
-    
-    .btn-outline:hover {
-        background-color: #f8f9fa;
-        border-color: #adb5bd;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #4361ee, #3a0ca3);
-        color: white;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-    }
-    
-    .btn-success {
-        background: linear-gradient(135deg, #28a745, #218838);
-        color: white;
-    }
-    
-    .btn-success:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-    }
-    
-    /* Error Messages */
-    .error-message {
-        color: #dc3545;
-        font-size: 0.8rem;
-        margin-top: 0.3rem;
-        animation: shake 0.5s;
-    }
-    
-    /* Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        20%, 60% { transform: translateX(-5px); }
-        40%, 80% { transform: translateX(5px); }
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-        .signup-card {
-            padding: 1.5rem;
-        }
-        
-        .progress-container {
-            margin-bottom: 1.5rem;
-        }
-        
-        .step-number {
-            width: 35px;
-            height: 35px;
-        }
-        
-        .step-label {
-            font-size: 0.75rem;
-        }
-        
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .interests-grid {
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .signup-container {
-            padding: 1rem;
-        }
-        
-        .step-actions {
-            flex-direction: column-reverse;
-            gap: 1rem;
-        }
-        
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
-    }
+}
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Form elements
-        const form = document.getElementById('signupForm');
-        const progressFill = document.querySelector('.progress-fill');
-        const steps = document.querySelectorAll('.step');
-        const stepContents = document.querySelectorAll('.step-content');
-        const nextButtons = document.querySelectorAll('.next-step');
-        const prevButtons = document.querySelectorAll('.prev-step');
-        const submitButton = document.querySelector('#step4 button[type="submit"]');
-        const profilePicInput = document.getElementById('id_profile_picture');
-        const avatarPreview = document.getElementById('avatarPreview');
-        let currentStep = 1;
+document.addEventListener('DOMContentLoaded', function() {
+    // Simple animation on scroll implementation
+    const aosElements = document.querySelectorAll('[data-aos]');
+    
+    function checkPosition() {
+        const windowHeight = window.innerHeight;
+        const triggerPosition = windowHeight / 1.2;
         
-        // Initialize
-        setupEventListeners();
-        
-        function setupEventListeners() {
-            // Next buttons
-            nextButtons.forEach(button => {
-                button.addEventListener('click', goToNextStep);
-            });
+        aosElements.forEach(element => {
+            const elementPosition = element.getBoundingClientRect().top;
             
-            // Previous buttons
-            prevButtons.forEach(button => {
-                button.addEventListener('click', goToPrevStep);
-            });
-            
-            // Profile picture upload
-            if (profilePicInput) {
-                profilePicInput.addEventListener('change', handleProfilePictureUpload);
+            if (elementPosition < triggerPosition) {
+                element.classList.add('aos-animate');
             }
+        });
+    }
+    
+    window.addEventListener('scroll', checkPosition);
+    window.addEventListener('resize', checkPosition);
+    checkPosition(); // Check on initial load
+
+    // Add ripple effect to submit button
+    const submitBtn = document.querySelector('.submit-btn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            const x = e.clientX - e.target.getBoundingClientRect().left;
+            const y = e.clientY - e.target.getBoundingClientRect().top;
             
-            // Form submission
-            if (submitButton) {
-                submitButton.addEventListener('click', handleFormSubmission);
-            }
-        }
-        
-        function goToNextStep() {
-            if (validateCurrentStep()) {
-                currentStep++;
-                updateProgress();
-                showStep(currentStep);
-                
-                // Prepare review if we're on the last step
-                if (currentStep === 4) {
-                    prepareReview();
-                }
-            }
-        }
-        
-        function goToPrevStep() {
-            currentStep--;
-            updateProgress();
-            showStep(currentStep);
-        }
-        
-        function validateCurrentStep() {
-            let isValid = true;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple-effect';
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
             
-            switch(currentStep) {
-                case 1:
-                    isValid = validateStep1();
-                    break;
-                case 2:
-                    isValid = validateStep2();
-                    break;
-                case 3:
-                    isValid = validateStep3();
-                    break;
-            }
+            this.appendChild(ripple);
             
-            return isValid;
-        }
-        
-        function validateStep1() {
-            let isValid = true;
-            const requiredFields = ['username', 'email', 'password1', 'password2'];
-            
-            requiredFields.forEach(fieldName => {
-                const field = form.querySelector(`[name="${fieldName}"]`);
-                if (field && !field.value.trim()) {
-                    field.reportValidity();
-                    isValid = false;
-                }
-            });
-            
-            // Check if passwords match
-            const password1 = form.querySelector('[name="password1"]').value;
-            const password2 = form.querySelector('[name="password2"]').value;
-            
-            if (password1 !== password2) {
-                alert("Passwords don't match");
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-        
-        function validateStep2() {
-            let isValid = true;
-            const requiredFields = ['first_name', 'last_name', 'pedagogic_level'];
-            
-            requiredFields.forEach(fieldName => {
-                const field = form.querySelector(`[name="${fieldName}"]`);
-                if (field && !field.value.trim()) {
-                    field.reportValidity();
-                    isValid = false;
-                }
-            });
-            
-            return isValid;
-        }
-        
-        function validateStep3() {
-            const checkedInterests = document.querySelectorAll('#step3 input[type="checkbox"]:checked');
-            if (checkedInterests.length < 3) {
-                alert('Please select at least 3 interests');
-                return false;
-            }
-            return true;
-        }
-        
-        function showStep(step) {
-            // Hide all step contents
-            stepContents.forEach(content => {
-                content.classList.remove('active');
-                content.style.opacity = '0';
-            });
-            
-            // Show current step
-            const currentContent = document.getElementById(`step${step}`);
-            currentContent.classList.add('active');
-            
-            // Fade in animation
-            let opacity = 0;
-            const fadeIn = setInterval(() => {
-                opacity += 0.05;
-                currentContent.style.opacity = opacity;
-                
-                if (opacity >= 1) {
-                    clearInterval(fadeIn);
-                }
-            }, 20);
-        }
-        
-        function updateProgress() {
-            // Update progress bar
-            const progressPercentage = (currentStep - 1) / (steps.length - 1) * 100;
-            progressFill.style.width = `${progressPercentage}%`;
-            
-            // Update steps
-            steps.forEach((step, index) => {
-                const stepNumber = index + 1;
-                
-                if (stepNumber < currentStep) {
-                    // Completed step
-                    step.classList.remove('active');
-                    step.classList.add('completed');
-                    step.querySelector('.step-number').innerHTML = '<i class="fas fa-check"></i>';
-                } else if (stepNumber === currentStep) {
-                    // Current step
-                    step.classList.add('active');
-                    step.classList.remove('completed');
-                    step.querySelector('.step-number').textContent = stepNumber;
-                } else {
-                    // Future step
-                    step.classList.remove('active', 'completed');
-                    step.querySelector('.step-number').textContent = stepNumber;
-                }
-            });
-        }
-        
-        function prepareReview() {
-            // Get values
-            const firstName = form.querySelector('[name="first_name"]').value || '-';
-            const lastName = form.querySelector('[name="last_name"]').value || '-';
-            const email = form.querySelector('[name="email"]').value || '-';
-            const birthDate = form.querySelector('[name="birth_date"]').value || '-';
-            const pedagogicLevel = form.querySelector('[name="pedagogic_level"]');
-            const pedagogicLevelText = pedagogicLevel ? pedagogicLevel.options[pedagogicLevel.selectedIndex].text : '-';
-            
-            // Get selected interests
-            const checkedInterests = document.querySelectorAll('#step3 input[type="checkbox"]:checked');
-            const interestsLabels = Array.from(checkedInterests).map(checkbox => {
-                return checkbox.nextElementSibling.textContent.trim();
-            }).join(', ') || 'None selected';
-            
-            // Update review
-            document.getElementById('review-fullname').textContent = `${firstName} ${lastName}`;
-            document.getElementById('review-email').textContent = email;
-            document.getElementById('review-birthdate').textContent = birthDate;
-            document.getElementById('review-level').textContent = pedagogicLevelText;
-            document.getElementById('review-interests').textContent = interestsLabels;
-        }
-        
-        function handleProfilePictureUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                // Validate file
-                if (file.size > 2 * 1024 * 1024) {
-                    alert('File is too large (max 2MB)');
-                    return;
-                }
-                
-                const validTypes = ['image/jpeg', 'image/png'];
-                if (!validTypes.includes(file.type)) {
-                    alert('Only JPG and PNG files are allowed');
-                    return;
-                }
-                
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    avatarPreview.innerHTML = `<img src="${event.target.result}" alt="Profile Preview">`;
-                    avatarPreview.style.border = '3px solid #4361ee';
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-        
-        function handleFormSubmission(e) {
-            e.preventDefault();
-            
-            // Validate terms agreement
-            if (!document.getElementById('terms').checked) {
-                alert('Please agree to the terms and conditions');
-                return;
-            }
-            
-            // Submit form
-            form.submit();
-        }
-    });
+            setTimeout(() => {
+                ripple.remove();
+            }, 1000);
+        });
+    }
+});
 </script>
 {% endblock %}

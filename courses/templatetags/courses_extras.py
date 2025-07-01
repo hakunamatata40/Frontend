@@ -12,3 +12,8 @@ def lower_class_name(obj):
     if obj:
         return obj.__class__.__name__.lower()
     return ''
+
+
+@register.filter
+def model_name(obj):
+    return obj._meta.model_name.lower()

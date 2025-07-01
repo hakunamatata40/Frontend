@@ -1,1 +1,255 @@
-<img src="{{ item.image.url }}" alt="Course Image" class="max-w-full h-auto rounded-lg shadow-md">
+<div class="image-content-container animated fadeIn">
+    <div class="image-card hover-float">
+        <div class="image-wrapper">
+            <img src="{{ item.image.url }}" alt="{{ item.title|default:'Course Image' }}" class="image-preview">
+            <div class="image-overlay">
+                <div class="overlay-content">
+                    <a href="{{ item.image.url }}" target="_blank" class="view-btn">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        View Full Size
+                    </a>
+                    <button class="zoom-btn">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                        </svg>
+                        Zoom
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        {% if item.title or item.description %}
+        <div class="image-meta">
+            {% if item.title %}
+            <h4 class="image-title">{{ item.title }}</h4>
+            {% endif %}
+            {% if item.description %}
+            <p class="image-description">{{ item.description }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Zoom Modal -->
+<div class="zoom-modal">
+    <div class="zoom-content">
+        <span class="close-zoom">&times;</span>
+        <img src="{{ item.image.url }}" alt="Zoomed Image" class="zoomed-image">
+    </div>
+</div>
+
+<style>
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
+    }
+
+    .animated {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .hover-float:hover {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Image Content Styles */
+    .image-content-container {
+        margin: 2rem 0;
+    }
+
+    .image-card {
+        background: var(--white);
+        border-radius: var(--rounded-xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .image-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .image-preview {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.5s ease;
+    }
+
+    .image-card:hover .image-preview {
+        transform: scale(1.05);
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .image-card:hover .image-overlay {
+        opacity: 1;
+    }
+
+    .overlay-content {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .view-btn,
+    .zoom-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--rounded-full);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .view-btn {
+        background: var(--white);
+        color: var(--gray-800);
+    }
+
+    .view-btn:hover {
+        background: var(--gray-100);
+        transform: translateY(-2px);
+    }
+
+    .zoom-btn {
+        background: var(--primary);
+        color: var(--white);
+    }
+
+    .zoom-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    .view-btn svg,
+    .zoom-btn svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-right: 0.5rem;
+    }
+
+    .image-meta {
+        padding: 1.5rem;
+    }
+
+    .image-title {
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.5rem;
+    }
+
+    .image-description {
+        color: var(--gray-600);
+        line-height: 1.6;
+    }
+
+    /* Zoom Modal Styles */
+    .zoom-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .zoom-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90vh;
+    }
+
+    .zoomed-image {
+        max-width: 100%;
+        max-height: 90vh;
+        display: block;
+        border-radius: var(--rounded);
+    }
+
+    .close-zoom {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    .close-zoom:hover {
+        color: var(--primary-light);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .overlay-content {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .view-btn,
+        .zoom-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Zoom functionality
+    const zoomBtns = document.querySelectorAll('.zoom-btn');
+    const zoomModal = document.querySelector('.zoom-modal');
+    const closeZoom = document.querySelector('.close-zoom');
+    const zoomedImage = document.querySelector('.zoomed-image');
+
+    zoomBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            zoomModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    closeZoom.addEventListener('click', function() {
+        zoomModal.style.display = 'none';
+        document.body.style.overflow = '';
+    });
+
+    // Close modal when clicking outside the image
+    zoomModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+});
+</script>

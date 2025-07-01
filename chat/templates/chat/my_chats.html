@@ -3,33 +3,406 @@
 {% block title %}My Chats{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">My Chats</h1>
+<div class="chats-container">
+    <div class="chats-header">
+        <h1>My Chats</h1>
+        <div class="wave-animation"></div>
+    </div>
 
     {% if chats %}
-        <ul class="divide-y divide-gray-200">
-            {% for course in chats %}
-                <li class="py-4 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-semibold text-blue-700">{{ course.title }} Chat</h2>
-                        <p class="text-gray-600 text-sm">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
-                    </div>
-                    <a href="{% url 'course_chat_detail' course.id %}"
-                       class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
-                        Go to Chat
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+    <div class="chats-grid">
+        {% for course in chats %}
+        <div class="chat-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:50 }}">
+            <div class="chat-card-content">
+                <div class="course-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                    </svg>
+                </div>
+                <h2>{{ course.title }} Chat</h2>
+                <p class="instructor">Instructor: {{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+            </div>
+            <div class="chat-card-action">
+                <a href="{% url 'course_chat_detail' course.id %}" class="chat-button">
+                    Join Chat
+                    <span class="hover-effect"></span>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     {% else %}
-        <p class="text-gray-600 italic">You don't have access to any course chats yet.</p>
+    <div class="empty-state" data-aos="fade-in">
+        <div class="empty-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 4h2v6h-2V7zm-2 4H9V7h2v4zm-2 2h2v2H9v-2zm6 0h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+            </svg>
+        </div>
+        <h3>No Chats Available</h3>
+        <p>You don't have access to any course chats yet.</p>
         {% if user.is_authenticated and user.user_type == 'student' %}
-            <p class="text-gray-600 mt-2">Enroll in a course to join its chat!</p>
-            <a href="{% url 'course_list' %}" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Browse Courses</a>
+        <p>Enroll in a course to join its chat!</p>
+        <a href="{% url 'course_list' %}" class="browse-button">
+            Browse Courses
+            <span class="button-hover"></span>
+        </a>
         {% elif user.is_authenticated and user.user_type == 'instructor' %}
-            <p class="text-gray-600 mt-2">Your courses will appear here once you've set them up.</p>
-            <a href="{% url 'instructor_dashboard' %}" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Go to Dashboard</a>
+        <p>Your courses will appear here once you've set them up.</p>
+        <a href="{% url 'instructor_dashboard' %}" class="browse-button">
+            Go to Dashboard
+            <span class="button-hover"></span>
+        </a>
         {% endif %}
+    </div>
     {% endif %}
 </div>
+
+<style>
+:root {
+    --primary-color: #6c5ce7;
+    --secondary-color: #a29bfe;
+    --accent-color: #fd79a8;
+    --dark-color: #2d3436;
+    --light-color: #f5f6fa;
+    --success-color: #00b894;
+    --warning-color: #fdcb6e;
+    --error-color: #d63031;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f9f9ff;
+    color: var(--dark-color);
+    line-height: 1.6;
+}
+
+.chats-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.chats-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.chats-header h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+}
+
+.wave-animation {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 10px;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 120 10" xmlns="http://www.w3.org/2000/svg"><path d="M0,5 C20,10 40,0 60,5 C80,10 100,0 120,5" stroke="%236c5ce7" fill="none" stroke-width="1"/></svg>') repeat-x;
+    animation: wave 2s linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes wave {
+    0% { background-position-x: 0; }
+    100% { background-position-x: 100px; }
+}
+
+.chats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.chat-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(108, 92, 231, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.chat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.1) 0%, rgba(253, 121, 168, 0.05) 100%);
+    z-index: -1;
+}
+
+.chat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2);
+}
+
+.chat-card-content {
+    padding: 2rem;
+    text-align: center;
+}
+
+.course-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+}
+
+.course-icon svg {
+    width: 30px;
+    height: 30px;
+    fill: white;
+}
+
+.chat-card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.chat-card .instructor {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.chat-card-action {
+    padding: 1rem 2rem 2rem;
+    text-align: center;
+}
+
+.chat-button {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+}
+
+.hover-effect {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.chat-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+}
+
+.chat-button:hover .hover-effect {
+    left: 100%;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(108, 92, 231, 0.1);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+}
+
+.empty-icon svg {
+    width: 40px;
+    height: 40px;
+    fill: white;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+}
+
+.empty-state p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.browse-button {
+    display: inline-block;
+    padding: 0.8rem 1.8rem;
+    background: linear-gradient(45deg, var(--success-color), #55efc4);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+}
+
+.button-hover {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.browse-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 184, 148, 0.4);
+}
+
+.browse-button:hover .button-hover {
+    left: 100%;
+}
+
+/* Animations */
+[data-aos] {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+[data-aos="fade-up"] {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+[data-aos="fade-up"].aos-animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+[data-aos="fade-in"] {
+    opacity: 0;
+}
+
+[data-aos="fade-in"].aos-animate {
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chats-header h1 {
+        font-size: 2rem;
+    }
+    
+    .chats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chat-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .chats-container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .chats-header {
+        margin-bottom: 2rem;
+    }
+    
+    .chat-card-content {
+        padding: 1.5rem;
+    }
+    
+    .chat-card-action {
+        padding: 1rem 1.5rem 1.5rem;
+    }
+    
+    .empty-state {
+        padding: 1.5rem 1rem;
+    }
+}
+</style>
+
+<script>
+// Simple animation on scroll implementation
+document.addEventListener('DOMContentLoaded', function() {
+    const aosElements = document.querySelectorAll('[data-aos]');
+    
+    function checkPosition() {
+        const windowHeight = window.innerHeight;
+        const triggerPosition = windowHeight / 1.2;
+        
+        aosElements.forEach(element => {
+            const elementPosition = element.getBoundingClientRect().top;
+            
+            if (elementPosition < triggerPosition) {
+                element.classList.add('aos-animate');
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', checkPosition);
+    window.addEventListener('resize', checkPosition);
+    checkPosition(); // Check on initial load
+});
+
+// Add ripple effect to buttons
+document.querySelectorAll('.chat-button, .browse-button').forEach(button => {
+    button.addEventListener('click', function(e) {
+        const x = e.clientX - e.target.getBoundingClientRect().left;
+        const y = e.clientY - e.target.getBoundingClientRect().top;
+        
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple-effect';
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 1000);
+    });
+});
+</script>
 {% endblock %}

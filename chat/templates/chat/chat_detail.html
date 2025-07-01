@@ -1,61 +1,906 @@
-{# chat/templates/chat/chat_detail.html #}
-{% extends 'base.html' %} {# Make sure this extends your project's base template #}
-{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EHBLO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #7c3aed;
+            --primary-hover: #6d28d9;
+            --secondary-color: #f3f4f6;
+            --text-color: #374151;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.15);
+            --rounded: 0.5rem;
+            --rounded-full: 9999px;
+        }
 
-{% block title %}Chat for {{ course.title }}{% endblock %}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block content %}
-<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-xl mt-8 mb-8">
-    <h2 class="text-3xl font-bold text-center text-purple-700 mb-6">
-        Course Chat: {{ course.title }}
-    </h2>
-    <p class="text-center text-gray-600 mb-4">
-        Connected as: <strong class="text-purple-600">{{ user.username }}</strong>
-    </p>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            background-color: var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
 
-    <div class="border border-gray-300 rounded-lg overflow-hidden flex flex-col h-[500px] shadow-inner">
-        {# Chat Messages Display Area #}
-        <div id="chat-log" class="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-2">
-            {# Messages will be dynamically loaded here by JavaScript #}
-            <p class="text-center text-gray-500 italic mt-4" id="loading-message">Loading messages...</p>
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header Styles */
+        .desktop-nav {
+            display: none;
+            position: static;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .logo-img {
+            height: 30px;
+            width: 30px;
+            margin-right: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--rounded);
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .profile-container {
+            position: relative;
+        }
+
+        .profile-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--rounded-full);
+            object-fit: cover;
+        }
+
+        .profile-default {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--rounded-full);
+            background-color: #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--white);
+            box-shadow: var(--shadow-md);
+            border-radius: var(--rounded);
+            padding: 1rem;
+            min-width: 150px;
+            display: none;
+            z-index: 100;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.5rem 0;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .dropdown-item:hover {
+            color: var(--primary-color);
+        }
+
+        .btn-logout {
+            color: var(--danger);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font: inherit;
+            margin-top: 0.5rem;
+        }
+
+        .btn-logout:hover {
+            color: var(--danger-hover);
+        }
+
+        /* Mobile Nav */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+            z-index: 1000;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+            min-width: 60px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .mobile-nav-item:hover {
+            color: var(--primary-color);
+        }
+
+        .mobile-nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 0.25rem;
+        }
+
+        .mobile-nav-text {
+            font-size: 0.75rem;
+        }
+
+        .mobile-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--white);
+            box-shadow: var(--shadow-md);
+            border-radius: var(--rounded);
+            padding: 0.5rem;
+            width: 130px;
+            display: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .mobile-dropdown.show {
+            display: block;
+        }
+
+        .mobile-dropdown-item {
+            display: block;
+            padding: 0.5rem;
+            text-align: center;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .mobile-dropdown-item:hover {
+            color: var(--primary-color);
+        }
+
+        /* Messages */
+        .messages-container {
+            margin: 1rem auto;
+            max-width: 1200px;
+            padding: 0 1rem;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: var(--rounded);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .message-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .message-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .message-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .message-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .message-close {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            margin-bottom: 80px;
+            padding: 2rem 0;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1f2937;
+            color: var(--white);
+            padding: 2rem 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #d1d5db;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #374151;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .desktop-nav {
+                display: flex;
+            }
+
+            .mobile-nav {
+                display: none;
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(4, 1fr);
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            main {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop Navbar -->
+    <nav class="desktop-nav">
+        <div class="logo-container">
+            <img src="/static/images/logo.png" alt="EHBLO Logo" class="logo-img">
+            EHBLO
         </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Courses</a>
+            {% if user.is_authenticated %}
+                {% if user.user_type == 'instructor' %}
+                    <a href="{% url 'instructor_dashboard' %}" class="nav-link">Instructor</a>
+                {% endif %}
+                <a href="{% url 'my_courses' %}" class="nav-link">My Courses</a>
+                <a href="{% url 'my_chats' %}" class="nav-link">Chats</a>
+                <div class="profile-container">
+                    <div class="profile-toggle">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="Profile" class="profile-img">
+                        {% else %}
+                            <div class="profile-default">U</div>
+                        {% endif %}
+                        <span>Profile</span>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
+                        <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-logout">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-link">Login</a>
+                <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
 
-        {# Message Input Area #}
-        <div class="p-4 bg-gray-100 border-t border-gray-300 flex items-center">
-            <input type="text" id="chat-message-input"
-                   class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 mr-3 text-gray-800"
-                   placeholder="Type your message here...">
-            <button id="chat-message-submit"
-                    class="bg-purple-600 text-white px-5 py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
-                Send
+    <!-- Mobile Navbar -->
+    <nav class="mobile-nav">
+        <a href="/" class="mobile-nav-item">
+            <i class="fas fa-book mobile-nav-icon"></i>
+            <span class="mobile-nav-text">Courses</span>
+        </a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'my_courses' %}" class="mobile-nav-item">
+                <i class="fas fa-clipboard-list mobile-nav-icon"></i>
+                <span class="mobile-nav-text">My Courses</span>
+            </a>
+            <a href="{% url 'my_chats' %}" class="mobile-nav-item">
+                <i class="fas fa-comments mobile-nav-icon"></i>
+                <span class="mobile-nav-text">Chats</span>
+            </a>
+            {% if user.user_type == 'instructor' %}
+                <a href="{% url 'instructor_dashboard' %}" class="mobile-nav-item">
+                    <i class="fas fa-chalkboard-teacher mobile-nav-icon"></i>
+                    <span class="mobile-nav-text">Instructor</span>
+                </a>
+            {% endif %}
+            <div class="mobile-nav-item" style="position: relative;">
+                <div id="mobile-profile-toggle" class="mobile-nav-item">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile" style="width: 24px; height: 24px; border-radius: 50%; margin-bottom: 0.25rem;">
+                    {% else %}
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #d1d5db; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; margin-bottom: 0.25rem;">U</div>
+                    {% endif %}
+                    <span class="mobile-nav-text">Profile</span>
+                </div>
+                <div id="mobile-profile-dropdown" class="mobile-dropdown">
+                    <a href="{% url 'profile' %}" class="mobile-dropdown-item">Profile</a>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="mobile-dropdown-item" style="color: var(--danger);">Logout</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="mobile-nav-item">
+                <i class="fas fa-sign-in-alt mobile-nav-icon"></i>
+                <span class="mobile-nav-text">Login</span>
+            </a>
+            <a href="{% url 'signup' %}" class="mobile-nav-item">
+                <i class="fas fa-user-plus mobile-nav-icon"></i>
+                <span class="mobile-nav-text">Sign Up</span>
+            </a>
+        {% endif %}
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="message message-{{ message.tags }}">
+                    <div>{{ message }}</div>
+                    <button class="message-close">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="container">
+<div class="chat-app-container">
+    <div class="chat-header">
+        <a href="{% url 'course_detail' pk=course.id slug=course.slug %}" class="back-button">
+            <svg viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>
+        </a>
+        <h1>{{ course.title }}</h1>
+        <div class="user-badge">
+            <span>{{ user.username|slice:":1"|upper }}</span>
+        </div>
+    </div>
+    
+    <div class="chat-container">
+        <div id="chat-log" class="chat-messages">
+            <div class="loading-message" id="loading-message">
+                <div class="loading-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <p>Loading messages...</p>
+            </div>
+        </div>
+        
+        <div class="chat-input-container" style="margin: 0 0 100px 0;">
+            <input type="text" id="chat-message-input" placeholder="Type your message..." autocomplete="off">
+            <button id="chat-message-submit">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
             </button>
         </div>
     </div>
-
-    <div class="text-center mt-6">
-        <a href="{% url 'course_detail' pk=course.id slug=course.slug %}"
-           class="text-purple-600 hover:underline font-medium">
-            &larr; Back to Course Details
-        </a>
-    </div>
 </div>
+    </main>
+
+<style>
+:root {
+    --primary-color: #6c5ce7;
+    --secondary-color: #a29bfe;
+    --accent-color: #fd79a8;
+    --dark-color: #2d3436;
+    --light-color: #f5f6fa;
+    --success-color: #00b894;
+    --warning-color: #fdcb6e;
+    --error-color: #d63031;
+    --user-message-bg: #6c5ce7;
+    --other-message-bg: #f1f1f1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5ff;
+    color: var(--dark-color);
+}
+
+.chat-app-container {
+    max-width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 0 30px rgba(108, 92, 231, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    box-shadow: 0 2px 10px rgba(108, 92, 231, 0.3);
+    position: relative;
+    z-index: 10;
+}
+
+.chat-header h1 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+    flex-grow: 1;
+    margin: 0 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.back-button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.back-button svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-3px);
+}
+
+.user-badge {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 72px);
+    position: relative;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background-color: #f9f9ff;
+    scroll-behavior: smooth;
+}
+
+.message {
+    max-width: 80%;
+    margin-bottom: 1rem;
+    position: relative;
+    animation: messageIn 0.3s ease-out forwards;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+@keyframes messageIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-user {
+    margin-left: auto;
+}
+
+.message-other {
+    margin-right: auto;
+}
+
+.message-content {
+    padding: 0.8rem 1.2rem;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.message-user .message-content {
+    background: var(--user-message-bg);
+    color: white;
+    border-top-right-radius: 4px;
+}
+
+.message-other .message-content {
+    background: var(--other-message-bg);
+    color: var(--dark-color);
+    border-top-left-radius: 4px;
+}
+
+.message-sender {
+    font-size: 0.75rem;
+    margin-bottom: 0.3rem;
+    display: block;
+    font-weight: 600;
+}
+
+.message-user .message-sender {
+    text-align: right;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.message-other .message-sender {
+    text-align: left;
+    color: #666;
+}
+
+.message-time {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    margin-top: 0.3rem;
+    display: block;
+}
+
+.message-user .message-time {
+    text-align: right;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.message-other .message-time {
+    text-align: left;
+    color: #666;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid #eee;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+#chat-message-input {
+    flex-grow: 1;
+    padding: 0.8rem 1.2rem;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f9f9f9;
+}
+
+#chat-message-input:focus {
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+}
+
+#chat-message-submit {
+    width: 50px;
+    height: 50px;
+    margin-left: 0.8rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(108, 92, 231, 0.3);
+}
+
+#chat-message-submit svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+#chat-message-submit:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+}
+
+#chat-message-submit:active {
+    transform: translateY(0);
+}
+
+.loading-message {
+    text-align: center;
+    padding: 2rem 0;
+    color: #666;
+}
+
+.loading-dots {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% { 
+        transform: scale(0);
+    } 40% { 
+        transform: scale(1);
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.empty-state p {
+    margin-top: 1rem;
+}
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-color);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 768px) {
+    .chat-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .message {
+        max-width: 90%;
+    }
+    
+    .chat-messages {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .chat-header h1 {
+        font-size: 1rem;
+    }
+    
+    .back-button, .user-badge {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .back-button svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .chat-container {
+        height: calc(100vh - 64px);
+    }
+    
+    .chat-input-container {
+        padding: 0.8rem;
+    }
+    
+    #chat-message-input {
+        padding: 0.7rem 1rem;
+    }
+    
+    #chat-message-submit {
+        width: 45px;
+        height: 45px;
+    }
+    
+    #chat-message-submit svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+</style>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     const courseId = "{{ course.id }}";
-    const chatLog = document.querySelector('#chat-log');
-    const messageInput = document.querySelector('#chat-message-input');
-    const messageSubmit = document.querySelector('#chat-message-submit');
-    const loadingMessage = document.querySelector('#loading-message'); // Reference to the "Loading messages..." paragraph
-    const currentUserId = "{{ user.id }}"; // Get the current user's ID for self-styling messages
+    const chatLog = document.getElementById('chat-log');
+    const messageInput = document.getElementById('chat-message-input');
+    const messageSubmit = document.getElementById('chat-message-submit');
+    const loadingMessage = document.getElementById('loading-message');
+    const currentUserId = "{{ user.id }}";
+    const currentUsername = "{{ user.username }}";
 
-    // Helper function to get CSRF token for POST requests
+    // Get CSRF token
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
             const cookies = document.cookie.split(';');
             for (let i = 0; i < cookies.length; i++) {
                 const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
@@ -66,106 +911,94 @@
     }
     const csrftoken = getCookie('csrftoken');
 
-    // Function to add a message to the chat log (handles styling for current user)
-    function addMessageToLog(message, senderUsername, senderId, timestampIso) {
-        const timestamp = new Date(timestampIso);
-        const timeString = timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); // e.g., "14:35"
-
+    // Create message element
+    function createMessageElement(content, senderUsername, senderId, timestamp) {
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('flex', 'mb-2');
+        const isCurrentUser = senderId.toString() === currentUserId.toString();
+        
+        const time = new Date(timestamp);
+        const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageDiv.className = `message ${isCurrentUser ? 'message-user' : 'message-other'}`;
+        messageDiv.innerHTML = `
+            <span class="message-sender">${senderUsername}</span>
+            <div class="message-content">
+                ${content}
+                <span class="message-time">${timeString}</span>
+            </div>
+        `;
+        
+        return messageDiv;
+    }
 
-        // Check if the sender is the current user for styling
-        const isCurrentUser = (parseInt(senderId) === parseInt(currentUserId));
-
-        if (isCurrentUser) {
-            messageDiv.classList.add('justify-end');
-        } else {
-            messageDiv.classList.add('justify-start');
+    // Add message to chat
+    function addMessageToLog(content, senderUsername, senderId, timestamp) {
+        const messageElement = createMessageElement(content, senderUsername, senderId, timestamp);
+        
+        if (loadingMessage && chatLog.contains(loadingMessage)) {
+            chatLog.removeChild(loadingMessage);
         }
-
-        const messageBubble = document.createElement('div');
-        messageBubble.classList.add(
-            'max-w-[70%]', 'p-3', 'rounded-lg', 'shadow-sm', 'text-sm'
-        );
-        if (isCurrentUser) {
-            messageBubble.classList.add('bg-purple-500', 'text-white');
-        } else {
-            messageBubble.classList.add('bg-gray-200', 'text-gray-800');
+        
+        if (chatLog.children.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            emptyState.innerHTML = '<p>No messages yet. Start the conversation!</p>';
+            chatLog.appendChild(emptyState);
+        } else if (chatLog.querySelector('.empty-state')) {
+            chatLog.removeChild(chatLog.querySelector('.empty-state'));
         }
-
-        const senderInfo = document.createElement('strong');
-        senderInfo.classList.add('block', 'text-xs', 'mb-1');
-        if (isCurrentUser) {
-            senderInfo.classList.add('text-purple-100');
-        } else {
-            senderInfo.classList.add('text-gray-600');
-        }
-        senderInfo.innerHTML = `${senderUsername} <span class="font-normal text-xs ml-1 opacity-75">(${timeString})</span>`;
-
-        const messageContent = document.createElement('p');
-        messageContent.classList.add('text-base');
-        messageContent.textContent = message;
-
-        messageBubble.appendChild(senderInfo);
-        messageBubble.appendChild(messageContent);
-        messageDiv.appendChild(messageBubble);
-        chatLog.appendChild(messageDiv);
-
-        // Auto-scroll to bottom after adding a message
+        
+        chatLog.appendChild(messageElement);
+        
+        setTimeout(() => {
+            messageElement.style.opacity = '1';
+            messageElement.style.transform = 'translateY(0)';
+        }, 10);
+        
         chatLog.scrollTop = chatLog.scrollHeight;
     }
 
-    // Function to fetch all current messages from the server
+    // Fetch messages
     async function fetchMessages() {
         try {
             const response = await fetch(`/chat/${courseId}/messages/`);
-            if (!response.ok) {
-                // If there's an error (e.g., 403 Forbidden, 404 Not Found)
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
             const data = await response.json();
             
-            // Remove the "Loading messages..." if it exists
-            if (loadingMessage && loadingMessage.parentNode) {
-                loadingMessage.parentNode.removeChild(loadingMessage);
-            }
-
-            // Clear existing messages to re-render all (simplifies logic for polling)
-            chatLog.innerHTML = ''; 
+            chatLog.innerHTML = '';
             
-            // Add fetched messages to the log
-            if (data.messages.length === 0) {
-                const noMessagesDiv = document.createElement('p');
-                noMessagesDiv.classList.add('text-center', 'text-gray-500', 'italic', 'mt-4');
-                noMessagesDiv.textContent = 'No messages yet. Start the conversation!';
-                chatLog.appendChild(noMessagesDiv);
-            } else {
+            if (data.messages && data.messages.length > 0) {
                 data.messages.forEach(msg => {
-                    addMessageToLog(msg.content, msg.sender_username, msg.sender_id, msg.timestamp);
+                    const messageElement = createMessageElement(
+                        msg.content, 
+                        msg.sender_username, 
+                        msg.sender_id, 
+                        msg.timestamp
+                    );
+                    messageElement.style.opacity = '1';
+                    messageElement.style.transform = 'translateY(0)';
+                    chatLog.appendChild(messageElement);
                 });
+            } else {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = '<p>No messages yet. Start the conversation!</p>';
+                chatLog.appendChild(emptyState);
             }
-
+            
+            chatLog.scrollTop = chatLog.scrollHeight;
         } catch (error) {
             console.error("Error fetching messages:", error);
-            // Display an error message in the chat log if fetching fails
-            if (loadingMessage) {
-                 loadingMessage.textContent = "Could not load messages. Please refresh.";
-            } else {
-                const errorMessageDiv = document.createElement('p');
-                errorMessageDiv.classList.add('text-center', 'text-red-500', 'italic', 'mt-4');
-                errorMessageDiv.textContent = "Error loading messages. Please refresh.";
-                chatLog.appendChild(errorMessageDiv);
-            }
+            showNotification("Could not load messages. Please refresh.", 'error');
         }
     }
 
-    // Function to send a message to the server
+    // Send message
     async function sendMessage() {
         const message = messageInput.value.trim();
-        if (message === '') {
-            return; // Don't send empty messages
-        }
-
+        if (!message) return;
+        
         try {
             const response = await fetch(`/chat/${courseId}/send/`, {
                 method: 'POST',
@@ -173,46 +1006,109 @@
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ 
+                    message: message,
+                    sender_id: currentUserId,
+                    course_id: courseId
+                })
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            // Clear input field after successful send
-            messageInput.value = ''; 
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
-            // After sending, immediately fetch all messages again to see the new one
-            await fetchMessages(); 
-
+            messageInput.value = '';
+            fetchMessages();
         } catch (error) {
             console.error("Error sending message:", error);
-            // Display an error if sending fails
-            addMessageToLog("Failed to send message. Please try again.", "System", null, new Date().toISOString()); // senderId null for system messages
+            showNotification("Failed to send message. Please try again.", 'error');
         }
     }
 
-    // Event listeners for sending messages
-    messageInput.focus(); // Focus on input when page loads
-    messageInput.onkeyup = function(e) {
-        if (e.keyCode === 13) { // Enter key
-            sendMessage();
+    // Show notification
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        
+        if (type === 'error') {
+            notification.style.background = 'var(--error-color)';
         }
-    };
-    messageSubmit.onclick = sendMessage; // Send button click
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
 
-    // --- Polling Logic ---
-    // Fetch messages immediately when the page loads
-    window.onload = function() {
-        fetchMessages();
-        chatLog.scrollTop = chatLog.scrollHeight; // Ensure scroll to bottom on load
-    };
+    // Event listeners
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
 
-    // Set up interval to fetch messages every X milliseconds (e.g., 3000ms = 3 seconds)
-    // Adjust this interval: shorter makes it feel more "real-time" but increases server load.
-    // Longer saves server resources but introduces more delay.
-    setInterval(fetchMessages, 3000); 
+    messageSubmit.addEventListener('click', sendMessage);
 
+    // Initial load
+    messageInput.focus();
+    fetchMessages();
+
+    // Poll for new messages
+    setInterval(fetchMessages, 2000);
+});
 </script>
-{% endblock %}
+ <script>
+        // Gestion du menu profile desktop
+        document.addEventListener('DOMContentLoaded', function() {
+            // Desktop dropdown
+            const profileToggle = document.querySelector('.profile-toggle');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+            
+            if (profileToggle && dropdownMenu) {
+                profileToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdownMenu.classList.toggle('show');
+                });
+            }
+            
+            // Mobile dropdown
+            const mobileProfileToggle = document.getElementById('mobile-profile-toggle');
+            const mobileProfileDropdown = document.getElementById('mobile-profile-dropdown');
+            
+            if (mobileProfileToggle && mobileProfileDropdown) {
+                mobileProfileToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mobileProfileDropdown.classList.toggle('show');
+                });
+            }
+            
+            // Fermer les dropdowns quand on clique ailleurs
+            document.addEventListener('click', function() {
+                if (dropdownMenu) dropdownMenu.classList.remove('show');
+                if (mobileProfileDropdown) mobileProfileDropdown.classList.remove('show');
+            });
+            
+            // Empêcher la propagation pour les dropdowns eux-mêmes
+            if (dropdownMenu) {
+                dropdownMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+            
+            if (mobileProfileDropdown) {
+                mobileProfileDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+            
+            // Fermer les messages
+            const messageCloseButtons = document.querySelectorAll('.message-close');
+            messageCloseButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.parentElement.remove();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

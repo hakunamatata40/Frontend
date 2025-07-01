@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHBLO Education</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hero-background {
+            background-image: url('back.jpeg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(4px);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+        }
+        .book-slide, .service-slide {
+            animation: slide 15s infinite linear;
+        }
+        @keyframes slide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        .book-container, .service-container {
+            display: flex;
+            overflow: hidden;
+            width: 100%;
+        }
+        .book-item, .service-item {
+            min-width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+        }
+        .service-item {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            margin: 5px 0;
+        }
+        .glow-button {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 5px #00f, 0 0 10px #00f; }
+            to { box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #0ff; }
+        }
+        .attractive-button {
+            transition: all 0.3s ease;
+        }
+        .attractive-button:hover {
+            transform: scale(1.1);
+            background-color: #1e40af;
+            color: #fff;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+        .navbar a {
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans relative">
+    <div class="hero-background"></div>
+    <header class="bg-cover bg-center h-96 relative pt-20">
+        <nav class="navbar container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-white text-2xl font-bold">EHBLO Education</div>
+            <ul class="flex space-x-6">
+                <li><a href="#" class="attractive-button">Services</a></li>
+                <li><a href="#" class="attractive-button">Contact</a></li>
+                <li><a href="#" class="attractive-button">Subscribe</a></li>
+            </ul>
+        </nav>
+        <div class="text-center pt-32 relative z-10">
+            <h1 class="text-white text-4xl font-bold">AROUND THE WORLD</h1>
+            <button class="mt-4 bg-blue-600 text-white px-6 py-2 rounded glow-button attractive-button">Contact Us</button>
+        </div>
+    </header>
+
+    <section class="container mx-auto px-6 py-12 mt-24">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Our Services</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="service-container service-slide">
+                <div class="service-item" style="background-image: url('book1.jpeg');"></div>
+                <div class="service-item" style="background-image: url('book2.jpeg');"></div>
+                <div class="service-item" style="background-image: url('book3.jpeg');"></div>
+            </div>
+            <div class="service-container service-slide">
+                <div class="service-item" style="background-image: url('prof1.jpeg');"></div>
+                <div class="service-item" style="background-image: url('prof2.jpeg');"></div>
+                <div class="service-item" style="background-image: url('prof3.jpeg');"></div>
+            </div>
+            <div class="service-container service-slide">
+                <div class="service-item" style="background-image: url('chat1.jpeg');"></div>
+                <div class="service-item" style="background-image: url('chat2.jpeg');"></div>
+                <div class="service-item" style="background-image: url('chat3.jpeg');"></div>
+            </div>
+            <div class="service-container service-slide">
+                <div class="service-item" style="background-image: url('interactive1.jpeg');"></div>
+                <div class="service-item" style="background-image: url('interactive2.jpeg');"></div>
+                <div class="service-item" style="background-image: url('interactive3.jpeg');"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 py-12 bg-white rounded-lg shadow-md">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Why Choose Us?</h2>
+        <div class="flex flex-col md:flex-row items-center justify-center">
+            <div class="md:w-1/2">
+                <div class="book-container book-slide">
+                    <div class="book-item" style="background-image: url('book1.jpeg');"></div>
+                    <div class="book-item" style="background-image: url('book2.jpeg');"></div>
+                    <div class="book-item" style="background-image: url('book3.jpeg');"></div>
+                </div>
+            </div>
+            <div class="md:w-1/2 text-center mt-6 md:mt-0">
+                <p class="text-gray-600 mb-4">Plongez dans un monde d’apprentissage avec EHBLO Education ! Nous proposons une vaste gamme de livres pour tous les niveaux, des professeurs experts à votre disposition pour des séances personnalisées, et un chat innovant avec une IA contextuelle pour répondre à vos questions en temps réel.</p>
+                <div class="flex justify-center items-center mb-2">
+                    <span class="w-4 h-4 bg-blue-600 rounded-full mr-2"></span>
+                    <span class="text-gray-800">Des experts à votre service</span>
+                </div>
+                <div class="flex justify-center items-center">
+                    <span class="w-4 h-4 bg-blue-600 rounded-full mr-2"></span>
+                    <span class="text-gray-800">Apprentissage interactif</span>
+                </div>
+                <img src="team.jpeg" alt="Team" class="mt-6 w-64 h-auto rounded-lg shadow-md mx-auto">
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 py-12">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Education Company with a Difference.</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <p class="text-gray-600">Nous sommes une entreprise éducative unique, offrant les meilleures ressources d’apprentissage au monde.</p>
+                <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded attractive-button">Learn More</button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <p class="text-gray-600">Accédez à des professeurs experts pour un accompagnement sur mesure.</p>
+                <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded attractive-button">Learn More</button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <p class="text-gray-600">Découvrez notre IA contextuelle pour une aide instantanée et personnalisée.</p>
+                <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded attractive-button">Learn More</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-blue-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8">Unmatched Educational Excellence.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-blue-800 p-6 rounded-lg shadow-md text-center">
+                    <img src="book1.jpeg" alt="Books" class="mx-auto mb-4">
+                    <h3 class="text-xl font-semibold">Books</h3>
+                    <p class="text-gray-300 mt-2">Une vaste collection pour tous les niveaux.</p>
+                </div>
+                <div class="bg-blue-800 p-6 rounded-lg shadow-md text-center">
+                    <img src="prof1.jpeg" alt="Professors" class="mx-auto mb-4">
+                    <h3 class="text-xl font-semibold">Professors</h3>
+                    <p class="text-gray-300 mt-2">Experts à votre disposition.</p>
+                </div>
+                <div class="bg-blue-800 p-6 rounded-lg shadow-md text-center">
+                    <img src="chat1.jpeg" alt="AI Chat" class="mx-auto mb-4">
+                    <h3 class="text-xl font-semibold">AI Chat</h3>
+                    <p class="text-gray-300 mt-2">Support intelligent et contextuel.</p>
+                </div>
+                <div class="bg-blue-800 p-6 rounded-lg shadow-md text-center">
+                    <img src="interactive1.jpeg" alt="Courses" class="mx-auto mb-4">
+                    <h3 class="text-xl font-semibold">Courses</h3>
+                    <p class="text-gray-300 mt-2">Apprentissage interactif et captivant.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <img src="logo.jpeg" alt="Logo" class="mb-4 md:mb-0">
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="attractive-button">Services</a>
+                <a href="#" class="attractive-button">Contact</a>
+                <a href="#" class="attractive-button">Subscribe</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

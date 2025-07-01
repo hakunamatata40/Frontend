@@ -1,380 +1,30 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EHBLO</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* Base Styles */
-        :root {
-            --primary-color: #7c3aed;
-            --primary-hover: #6d28d9;
-            --secondary-color: #f3f4f6;
-            --text-color: #374151;
-            --text-light: #6b7280;
-            --white: #ffffff;
-            --danger: #dc2626;
-            --danger-hover: #b91c1c;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.15);
-            --rounded: 0.5rem;
-            --rounded-full: 9999px;
-        }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% block title %}EHBLO Education{% endblock %}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-color);
-            background-color: var(--secondary-color);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            line-height: 1.6;
-        }
+{% block content %}
+<style>
+    .material-symbols-outlined {
+        font-family: 'Material Symbols Outlined';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .container {
-            width: 100%;
-            padding: 0 1rem;
-        }
-
-        /* Header Styles */
-        .desktop-nav {
-            display: none;
-            background-color: var(--white);
-            box-shadow: var(--shadow);
-            padding: 1rem;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .logo-img {
-            height: 30px;
-            width: 30px;
-            margin-right: 1rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: var(--text-color);
-            transition: color 0.3s;
-        }
-
-        .nav-link:hover {
-            color: var(--primary-color);
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: var(--rounded);
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .profile-container {
-            position: relative;
-        }
-
-        .profile-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-        }
-
-        .profile-img {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--rounded-full);
-            object-fit: cover;
-        }
-
-        .profile-default {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--rounded-full);
-            background-color: #d1d5db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: var(--white);
-            box-shadow: var(--shadow-md);
-            border-radius: var(--rounded);
-            padding: 1rem;
-            min-width: 150px;
-            display: none;
-            z-index: 100;
-        }
-
-        .dropdown-menu.show {
-            display: block;
-        }
-
-        .dropdown-item {
-            display: block;
-            padding: 0.5rem 0;
-            color: var(--text-color);
-            transition: color 0.3s;
-        }
-
-        .dropdown-item:hover {
-            color: var(--primary-color);
-        }
-
-        .btn-logout {
-            color: var(--danger);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            font: inherit;
-            margin-top: 0.5rem;
-        }
-
-        .btn-logout:hover {
-            color: var(--danger-hover);
-        }
-
-        /* Mobile Nav */
-        .mobile-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--white);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-around;
-            padding: 0.5rem 0;
-            z-index: 1000;
-        }
-
-        .mobile-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0.5rem;
-            min-width: 60px;
-            color: var(--text-color);
-            transition: color 0.3s;
-        }
-
-        .mobile-nav-item:hover {
-            color: var(--primary-color);
-        }
-
-        .mobile-nav-icon {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 0.25rem;
-        }
-
-        .mobile-nav-text {
-            font-size: 0.75rem;
-        }
-
-        .mobile-dropdown {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--white);
-            box-shadow: var(--shadow-md);
-            border-radius: var(--rounded);
-            padding: 0.5rem;
-            width: 130px;
-            display: none;
-            margin-bottom: 0.5rem;
-        }
-
-        .mobile-dropdown.show {
-            display: block;
-        }
-
-        .mobile-dropdown-item {
-            display: block;
-            padding: 0.5rem;
-            text-align: center;
-            color: var(--text-color);
-            transition: color 0.3s;
-        }
-
-        .mobile-dropdown-item:hover {
-            color: var(--primary-color);
-        }
-
-        /* Messages */
-        .messages-container {
-            margin: 1rem auto;
-            max-width: 1200px;
-            padding: 0 1rem;
-        }
-
-        .message {
-            padding: 1rem;
-            border-radius: var(--rounded);
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .message-success {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-
-        .message-warning {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-
-        .message-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        .message-info {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-
-        .message-close {
-            background: none;
-            border: none;
-            color: inherit;
-            cursor: pointer;
-            font-size: 1.25rem;
-        }
-
-        /* Main Content */
-        main {
-            flex: 1;
-            margin-bottom: 80px;
-            padding: 2rem 0;
-        }
-
-        /* Footer */
-        footer {
-            background-color: #1f2937;
-            color: var(--white);
-            padding: 2rem 0;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 2rem;
-            padding: 0 1rem;
-        }
-
-        .footer-section h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .footer-section p {
-            margin-bottom: 1rem;
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-links a {
-            color: #d1d5db;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary-color);
-        }
-
-        .footer-copyright {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #374151;
-        }
-
-        /* Responsive */
-        @media (min-width: 768px) {
-            .desktop-nav {
-                display: flex;
-            }
-
-            .mobile-nav {
-                display: none;
-            }
-
-            .footer-grid {
-                grid-template-columns: repeat(4, 1fr);
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-
-            main {
-                margin-bottom: 0;
-            }
-        }
-
-
-
-        /* Styles spécifiques à la page d'accueil */
     .hero-background {
+        background-image: url('{% static "back.png" %}');
         background-size: cover;
         background-position: center;
         position: absolute;
@@ -383,6 +33,33 @@
         width: 50%;
         height: 100vh;
         z-index: 0;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(75, 0, 130, 0.7);
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .navbar h1 {
+        font-size: 1.2rem;
+        color: white;
+    }
+    .navbar a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+    .navbar a:hover {
+        color: #4B0082;
     }
 
     .hero {
@@ -395,7 +72,6 @@
         justify-content: center;
         background: linear-gradient(to right, #4B0082, #E6E6FA);
     }
-
     .hero-content {
         margin: 100px 0 0 20px;
         max-width: 100%;
@@ -404,23 +80,19 @@
         justify-content: space-between;
         align-items: center;
     }
-
     .tete {
         width: 45%;
     }
-
     .hero h1 {
         font-size: 48px;
         margin-bottom: 20px;
         color: #fff;
     }
-
     .hero p {
         font-size: 18px;
         margin-bottom: 30px;
         color: #fff;
     }
-
     .btn-container {
         display: flex;
         flex-direction: row;
@@ -428,7 +100,6 @@
         align-items: center;
         flex-wrap: wrap;
     }
-
     .btn {
         padding: 10px 18px;
         border: none;
@@ -444,7 +115,6 @@
         text-align: center;
         white-space: nowrap;
     }
-
     .btn-blue { background-color: #1E90FF; }
     .btn-blue:hover { background-color: #104E8B; transform: translateY(-2px); }
     .btn-purple { background-color: #8A2BE2; }
@@ -456,7 +126,6 @@
         text-align: center;
         overflow: hidden;
     }
-
     .carousel {
         position: relative;
         overflow: hidden;
@@ -464,18 +133,15 @@
         max-width: 1200px;
         margin: 0 auto;
     }
-
     .carousel-track {
         display: flex;
         width: fit-content;
         animation: scrollCarousel 20s linear infinite;
     }
-
     @keyframes scrollCarousel {
         0% { transform: translateX(0); }
         100% { transform: translateX(-50%); }
     }
-
     .item {
         flex: 0 0 auto;
         width: 250px;
@@ -489,23 +155,39 @@
         position: relative;
         z-index: 1;
     }
-
     .item:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         z-index: 2;
     }
-
     .item img {
         width: 100%;
         border-radius: 10px;
         height: 180px;
         object-fit: cover;
     }
-
     .item h3 {
         margin: 10px 0 5px;
         color: #6A0DAD;
+    }
+
+    .stats-section {
+        display: flex;
+        justify-content: space-around;
+        margin: 40px 0;
+        flex-wrap: wrap;
+        background: #fff;
+        padding: 20px;
+    }
+    .stat {
+        background: #D8BFD8;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 10px;
+        width: 250px;
+        text-align: center;
+        font-size: 20px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
     .services {
@@ -513,7 +195,11 @@
         padding: 40px 20px;
         background: #E6E6FA;
     }
-
+    .services h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: #6A0DAD;
+    }
     .slider-container {
         position: relative;
         overflow: hidden;
@@ -521,18 +207,15 @@
         max-width: 1200px;
         margin: 0 auto;
     }
-
     .slider {
         display: flex;
         width: fit-content;
         animation: scrollSlider 20s linear infinite;
     }
-
     @keyframes scrollSlider {
         0% { transform: translateX(0); }
         100% { transform: translateX(-50%); }
     }
-
     .slider-item {
         flex: 0 0 auto;
         width: 350px;
@@ -545,19 +228,16 @@
         position: relative;
         z-index: 1;
     }
-
     .slider-item:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         z-index: 2;
     }
-
     .review-header {
         display: flex;
         align-items: center;
         margin-bottom: 15px;
     }
-
     .review-avatar {
         width: 50px;
         height: 50px;
@@ -565,14 +245,12 @@
         object-fit: cover;
         margin-right: 15px;
     }
-
     .review-name {
         font-weight: 600;
         color: #6A0DAD;
         flex-grow: 1;
         text-align: right;
     }
-
     .review-content {
         color: #555;
         font-size: 14px;
@@ -580,7 +258,6 @@
         margin-bottom: 15px;
         text-align: left;
     }
-
     .review-footer {
         display: flex;
         justify-content: space-between;
@@ -588,18 +265,15 @@
         font-size: 12px;
         color: #777;
     }
-
     .review-subject {
         background-color: #E6E6FA;
         padding: 3px 8px;
         border-radius: 12px;
         font-size: 12px;
     }
-
     .review-date {
         font-style: italic;
     }
-
     .nav-btn {
         position: absolute;
         top: 50%;
@@ -619,78 +293,93 @@
         opacity: 0.7;
         transition: opacity 0.3s;
     }
-
     .nav-btn:hover {
         opacity: 1;
     }
-
     .prev {
         left: 10px;
     }
-
     .next-2 {
         right: 10px;
     }
 
     /* Mobile styles */
     @media (max-width: 768px) {
+        .navbar {
+            flex-direction: column;
+            padding: 10px;
+        }
+        .navbar h1 {
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        .navbar ul {
+            width: 100%;
+            justify-content: space-around;
+        }
+        .navbar a {
+            font-size: 12px;
+        }
+
         .hero-content {
             flex-direction: column;
             margin: 80px 0 0 0;
             text-align: center;
         }
-
         .tete {
             width: 100%;
             margin-bottom: 30px;
         }
-
         .hero h1 {
             font-size: 28px;
             margin-bottom: 15px;
         }
-
         .hero p {
             font-size: 16px;
             margin-bottom: 20px;
         }
-
         .btn-container {
             justify-content: center;
         }
-
         .btn {
             padding: 8px 15px;
             font-size: 14px;
         }
-
         .hero-background {
             width: 100%;
             opacity: 0.3;
         }
 
+        .carousel-section h2 {
+            font-size: 18px;
+        }
         .item {
             width: 200px;
         }
-
         .item img {
             height: 140px;
         }
 
+        .stat {
+            width: 100%;
+            margin: 5px 0;
+            font-size: 18px;
+        }
+
+        .services h2 {
+            font-size: 22px;
+        }
         .slider-item {
             width: 280px;
             margin: 0 10px;
         }
-
         .review-avatar {
             width: 40px;
             height: 40px;
         }
-
         .review-name {
             font-size: 14px;
         }
-
         .review-content {
             font-size: 13px;
         }
@@ -706,11 +395,9 @@
         .hero {
             padding: 80px 15px;
         }
-
         .hero h1 {
             font-size: 24px;
         }
-
         .hero p {
             font-size: 14px;
         }
@@ -719,11 +406,9 @@
             width: 160px;
             padding: 10px;
         }
-
         .item img {
             height: 120px;
         }
-
         .item h3 {
             font-size: 16px;
         }
@@ -732,38 +417,24 @@
             width: 240px;
             padding: 10px;
         }
-
         .review-header {
             margin-bottom: 10px;
         }
-
         .review-avatar {
             width: 35px;
             height: 35px;
             margin-right: 10px;
         }
     }
-    </style>
 
-</head>
-<body>
-
-
-    <!-- Messages -->
-    {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-                <div class="message message-{{ message.tags }}">
-                    <div>{{ message }}</div>
-                    <button class="message-close">&times;</button>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <!-- Main Content -->
-    <main class="container">
-
+    footer {
+        text-align: center;
+        padding: 15px;
+        background: #4B0082;
+        color: #fff;
+        margin-top: 30px;
+    }
+</style>
 
 <div class="hero-background"></div>
 
@@ -774,7 +445,7 @@
             <p>Découvrez une vaste gamme de livres, des professeurs experts et une IA contextuelle innovante.</p>
             <div class="btn-container">
                 <a href="{% url 'course_list' %}" class="btn btn-blue">Explorer les Cours</a>
-                <a href="{% url 'signup' %}" class="btn btn-purple">S'inscrire</a>
+                <a  href="{% url 'signup' %}" class="btn btn-purple">S'inscrire</a>
             </div>
         </div>
         <img src="{% static 'back.png' %}" alt="Illustration éducation" class="hero-image">
@@ -963,7 +634,7 @@
         <button class="nav-btn next-2">❯</button>
     </div>
 </section>
-</main>
+
 <script>
     // Slider functionality
     const slider = document.querySelector('.slider');
@@ -1067,91 +738,4 @@
     window.addEventListener('load', adjustSliderItems);
     window.addEventListener('resize', adjustSliderItems);
 </script>
-
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-grid">
-            <div class="footer-section">
-                <h3>EHBLO</h3>
-                <p>Empowering your learning journey with the best online courses and interactive experiences.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul class="footer-links">
-                    <li><a href="{% url 'my_courses' %}">Courses</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Support</h3>
-                <ul class="footer-links">
-                    <!-- Add support links here -->
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Legal</h3>
-                <ul class="footer-links">
-                    <!-- Add legal links here -->
-                </ul>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <p>&copy; {% now "Y" %} EHBLO. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        // Gestion du menu profile desktop
-        document.addEventListener('DOMContentLoaded', function() {
-            // Desktop dropdown
-            const profileToggle = document.querySelector('.profile-toggle');
-            const dropdownMenu = document.querySelector('.dropdown-menu');
-            
-            if (profileToggle && dropdownMenu) {
-                profileToggle.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    dropdownMenu.classList.toggle('show');
-                });
-            }
-            
-            // Mobile dropdown
-            const mobileProfileToggle = document.getElementById('mobile-profile-toggle');
-            const mobileProfileDropdown = document.getElementById('mobile-profile-dropdown');
-            
-            if (mobileProfileToggle && mobileProfileDropdown) {
-                mobileProfileToggle.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    mobileProfileDropdown.classList.toggle('show');
-                });
-            }
-            
-            // Fermer les dropdowns quand on clique ailleurs
-            document.addEventListener('click', function() {
-                if (dropdownMenu) dropdownMenu.classList.remove('show');
-                if (mobileProfileDropdown) mobileProfileDropdown.classList.remove('show');
-            });
-            
-            // Empêcher la propagation pour les dropdowns eux-mêmes
-            if (dropdownMenu) {
-                dropdownMenu.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
-            
-            if (mobileProfileDropdown) {
-                mobileProfileDropdown.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
-            
-            // Fermer les messages
-            const messageCloseButtons = document.querySelectorAll('.message-close');
-            messageCloseButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    this.parentElement.remove();
-                });
-            });
-        });
-    </script>
-</body>
-</html>
+{% endblock %}
